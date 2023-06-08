@@ -1,0 +1,196 @@
+datasource db {
+  url = env("DATABASE_URL")
+  provider = "mysql"
+  referentialIntegrity = "prisma"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+model Career{
+    id                      Int      @id @default(autoincrement())
+    name                    String   @unique
+    curricularStructures    CurricularStructure[]
+    @@index([name])
+}
+
+model CurricularStructure{
+    id          Int     @id @default(autoincrement())
+    year        String  
+    code        String  //MC-R-2022
+    month       MonthEnum
+    isRegular   Boolean
+    careerId    Int
+    career      Career    @relation(fields: [careerId], references: [id])
+    modules     Module[]
+    registers   Register[]
+
+}
+
+model Module {
+  id                        Int      @id @default(autoincrement())
+  name                      String   
+  curricularStructure       CurricularStructure @relation(fields: [curricularStructureId] , references: [id])
+  curricularStructureId     Int
+  courses                   Course[]
+  subscriptionsModule       SubscriptionModule[]
+  @@index([name])
+}
+
+model Course {
+  id                        Int      @id @default(autoincrement())
+  name                      String
+  moduleId                  Int
+  type                      String
+  sessions                  Int           //Cantidad de clases que se impartira para el curso
+  module                    Module   @relation(fields: [moduleId], references: [id])
+  rooms                     Room[]
+  @@index([name])
+}
+
+model Student {
+    id                        Int      @id @default(autoincrement())
+    code                      String
+    fullName                  String
+    dni                       String  @unique
+    telephone                 String
+    dateStart                 DateTime
+    dateEnd                   DateTime?
+    admision                  String
+    registers                 Register[]
+}
+
+model Teacher{
+    id              Int      @id @default(autoincrement())
+    fullName        String   
+    telephone       String
+    dni             String  @unique
+    rooms           Room[]
+    @@index([fullName])
+}
+
+model User {
+  id          Int     @id @default(autoincrement())
+  email       String  @unique 
+  password    String  @unique 
+  username    String
+  role        TypeUser
+  requests    Request[]
+  @@index([email])
+  @@index([password])
+}
+
+model Register {
+    id                      Int                     @id @default(autoincrement())
+    studentId               Int
+    curricularId            Int
+    scheduleAdmision        String
+    dateStart               DateTime
+    dateEnd                 DateTime?
+    student                 Student                 @relation(fields: [studentId],references: [id])
+    curricular              CurricularStructure     @relation(fields: [curricularId],references: [id])
+    subscriptionsModule     SubscriptionModule[]
+}
+
+model SubscriptionModule {
+    id              Int         @id @default(autoincrement())
+    register        Register    @relation(fields: [registerId] , references: [id])
+    registerId      Int
+    module          Module      @relation(fields: [moduleId] , references: [id])
+    moduleId        Int
+    subscriptionsRoom SubscriptionRoom[]
+}
+
+model SubscriptionRoom {
+    id                        Int          @id @default(autoincrement())
+    score                     Int
+    courseName                String
+    subscriptionModuleId      Int
+    roomId                    Int
+    room                      Room         @relation(fields: [roomId],references: [id])
+    subscriptionModule        SubscriptionModule      @relation(fields: [subscriptionModuleId],references: [id])
+    attendances               Attendance[]
+    requests                  Request[]
+    quantityUpdated           Int
+}
+
+model Room {
+  id              Int     @id @default(autoincrement())
+  name            String
+  schedule        String  @default("VACIO")
+  dateStart       DateTime
+  dateEnd         DateTime
+  courseId        Int
+  teacherId       Int           @default(0)
+  course          Course        @relation(fields: [courseId] , references: [id])
+  teacher         Teacher?      @relation(fields: [teacherId],references: [id])
+  hourStart       String
+  hourEnd         String
+  subscriptions   SubscriptionRoom[]
+  section         String        @default("")
+  frecuency       String //(L M MI J V S D) => ( LMiV )
+}
+
+model Attendance {
+    id                  Int         @id @default(autoincrement())
+    date                DateTime
+    subscriptionRoom    SubscriptionRoom @relation(fields: [subscriptionRoomId] , references: [id])
+    subscriptionRoomId  Int
+    stateAttendance     AttendanceState     @default(PENDIENTE)
+}
+
+model Request {
+    id                      Int     @id @default(autoincrement())
+    stateUpdate             StateUpdate
+    // state                   Boolean
+    documents               String  @db.Text
+    observation             String  @db.Text
+    dateRequest             DateTime
+    user                    User @relation(fields: [userId] , references: [id])
+    userId                  Int
+    subscriptionRoom        SubscriptionRoom @relation(fields: [subscriptionRoomId] , references: [id])
+    subscriptionRoomId      Int
+    reason                  String  @db.Text
+}
+
+enum AttendanceState {
+    PENDIENTE
+    PRESENTE
+    FALTA
+    JUSTIFICADO
+}
+
+enum StateUpdate {
+    PENDIENTE
+    ACEPTADO
+    RECHAZADO
+    OBSERVADO
+}
+
+enum MonthEnum {
+  ENERO
+  FEBRERO
+  MARZO
+  ABRIL
+  MAYO
+  JUNIO
+  JULIO
+  AGOSTO
+  SEPTIEMBRE
+  OCTUBRE
+  NOVIEMBRE
+  DICIEMBRE
+}
+
+// enum TypeCourse {
+//     TEORICO
+//     PRACTICO
+//     TEORICO_PRACTICO //TEORICO / PRACTICO
+// }
+
+enum TypeUser {
+    ADMIN
+    SUPERVISOR
+}
