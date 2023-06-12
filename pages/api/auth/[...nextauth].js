@@ -18,6 +18,7 @@ export default NextAuth ({
                 // Add logic here to look up the user from the credentials supplied
                 try {
                     const user = await login({ email: credentials.email, password: credentials.password });
+                    console.log(user);
                     return user;
                 } catch (e) {
                     console.log(e);
