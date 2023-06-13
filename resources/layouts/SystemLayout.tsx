@@ -9,7 +9,8 @@ import { AreaSidebar, useStoreSidebar } from 'resources/local/store.sidebar';
 const SystemLayout = (props : any) => {
 
     const { isOpen , setToggleSidebar } = useStoreSidebar()
-    const { data , status } = useSession()
+    const { data , status } = useSession();
+     console.log( data?.user?.email+ "===" + data?.user?.name );
     const toggleDrawer = (open: boolean) => (event: KeyboardEvent | MouseEvent) => {
       if (
         event.type === 'keydown' &&
