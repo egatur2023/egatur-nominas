@@ -10,7 +10,8 @@ const SystemLayout = (props : any) => {
 
     const { isOpen , setToggleSidebar } = useStoreSidebar()
     const { data , status } = useSession();
-     console.log( data?.user?.email+ "===" + data?.user?.name );
+     console.log(typeof data?.user?.email+ "===" +data?.user?.email );
+    console.log(typeof data?.user?.name+ "===" +data?.user?.name );
     const toggleDrawer = (open: boolean) => (event: KeyboardEvent | MouseEvent) => {
       if (
         event.type === 'keydown' &&
