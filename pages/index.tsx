@@ -5,6 +5,7 @@ import { Container, Box, Grid, Typography, Button, TextField, Stack, Alert, Circ
 import { useFormik } from "formik"
 import { schemaLogin } from "resources/validation/schema.login"
 import { Check } from "@mui/icons-material"
+import Image from "next/image";
 
 
 const Login = () => {
@@ -62,9 +63,16 @@ const Login = () => {
                         alignItems="center"
                         gap={2}
                     >
-                        <Typography variant="h3" gutterBottom component="div">
-                            Nominas EGA
-                        </Typography>
+                        <Image
+                                width={350}
+                                height={100}
+                                src="/logo.png"
+                                alt="Logo Egatur"
+                            />
+                            <Typography variant="subtitle1" gutterBottom component="div"
+                            >
+                                Sistemas Historial Academico
+                            </Typography>
 
                         <form
                             style={{ width: "100%"}}
@@ -73,12 +81,13 @@ const Login = () => {
                             <Stack
                                 spacing={2}
                             >
-                                {
+                                {/*
                                     isError &&
                                     <Alert severity="error">
                                         Usuario y/o contraseña invalida(s)
                                     </Alert>
-                                }
+                             
+                                
                                 <TextField
                                     fullWidth
                                     id="email"
@@ -113,8 +122,20 @@ const Login = () => {
                                     >
                                     { formik.isSubmitting ? "Verificando..." : "Ingresar" }
                                 </Button>
-
-                                <Button onClick={() => signIn('google',{callbackUrl : "/app/dashboard"})}>sign in with gooogle</Button>
+                                */}
+                                <Button
+                                        color={"primary"}
+                                        variant="contained"
+                                        fullWidth
+                                        type="submit"
+                                        onClick={() =>
+                                            signIn("google", {
+                                                callbackUrl: "/app/dashboard",
+                                            })
+                                        }
+                                    >
+                                        Ingresar con Google
+                                  </Button>
                             </Stack>
 
                         </form>
