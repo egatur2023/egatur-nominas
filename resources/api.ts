@@ -4,7 +4,7 @@ import { saveAs } from 'file-saver';
 
 export const instanceAxios = axios.create({
     // baseURL: "https://brann4-registro-academico-ega-w5vqxxp9p4f5q4q-3000.githubpreview.dev/"
-    baseURL : process.env.NODE_ENV == "production" ? "https://registro-academico-ega.vercel.app" : "http://localhost:3000"
+    baseURL : process.env.NODE_ENV == "production" ? "https://egatur-nominas.vercel.app/" : "http://localhost:3000"
 })
 
 export default abstract class API {
