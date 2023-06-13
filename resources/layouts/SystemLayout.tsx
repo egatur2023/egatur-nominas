@@ -10,8 +10,6 @@ const SystemLayout = (props : any) => {
 
     const { isOpen , setToggleSidebar } = useStoreSidebar()
     const { data , status } = useSession();
-     console.log(typeof data?.user?.email+ "===" +data?.user?.email );
-    console.log(typeof data?.user?.name+ "===" +data?.user?.name );
     const toggleDrawer = (open: boolean) => (event: KeyboardEvent | MouseEvent) => {
       if (
         event.type === 'keydown' &&
@@ -64,7 +62,7 @@ const SystemLayout = (props : any) => {
 
             <ListMenu
                 //@ts-ignore
-                itemsSidebar={ String(data?.user?.role) == "ADMIN" ? itemsSidebarAdmin : itemsSidebarSupervisor }
+                itemsSidebar={ ( String(data?.user?.email?.includes("sistemas")) ) ? itemsSidebarAdmin : itemsSidebarSupervisor }
             />
             </Drawer>
           <main>
