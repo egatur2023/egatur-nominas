@@ -113,6 +113,8 @@ const Login = () => {
                                     >
                                     { formik.isSubmitting ? "Verificando..." : "Ingresar" }
                                 </Button>
+
+                                <Button onClick={() => signIn('google',{callbackUrl : "/app/dashboard"})}>sign in with gooogle</Button>
                             </Stack>
 
                         </form>

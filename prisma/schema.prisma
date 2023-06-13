@@ -18,7 +18,7 @@ model Career{
 
 model CurricularStructure{
     id          Int     @id @default(autoincrement())
-    year        String  
+    year        String
     code        String  //MC-R-2022
     month       MonthEnum
     isRegular   Boolean
@@ -31,7 +31,7 @@ model CurricularStructure{
 
 model Module {
   id                        Int      @id @default(autoincrement())
-  name                      String   
+  name                      String
   curricularStructure       CurricularStructure @relation(fields: [curricularStructureId] , references: [id])
   curricularStructureId     Int
   courses                   Course[]
@@ -64,7 +64,7 @@ model Student {
 
 model Teacher{
     id              Int      @id @default(autoincrement())
-    fullName        String   
+    fullName        String
     telephone       String
     dni             String  @unique
     rooms           Room[]
@@ -73,13 +73,13 @@ model Teacher{
 
 model User {
   id          Int     @id @default(autoincrement())
-  email       String  @unique 
-  password    String  @unique 
+  email       String  @unique
+  password    String
   username    String
   role        TypeUser
   requests    Request[]
   @@index([email])
-  @@index([password])
+//   @@index([password])
 }
 
 model Register {
