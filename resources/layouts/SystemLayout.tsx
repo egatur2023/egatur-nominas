@@ -62,7 +62,7 @@ const SystemLayout = (props : any) => {
 
             <ListMenu
                 //@ts-ignore
-                itemsSidebar={ ( String(data?.user?.email?.includes("sistemas")) ) ? itemsSidebarAdmin : itemsSidebarSupervisor }
+                itemsSidebar={ ( String(data?.user?.email?.includes("@egatur.edu.pe")) ) ? itemsSidebarAdmin : itemsSidebarSupervisor }
             />
             </Drawer>
           <main>
