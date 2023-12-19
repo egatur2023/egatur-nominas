@@ -14,7 +14,6 @@ export default NextAuth ({
             clientSecret: "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"*/
           })
     ],
-
     callbacks: {
         // jwt: async ({ token, user }) => {
         //     user && (token.user = user);

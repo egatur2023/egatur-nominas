@@ -21,7 +21,7 @@ export default function ReportFilter() {
         })
     ),[])
     const { dataReport1 } = useStoreReport()
-    
+
     let date = new Date()
     const [params , setParams ] = useState<DtoFilterReport>({
         careerId : 0,
@@ -54,7 +54,7 @@ export default function ReportFilter() {
                 </Stack>
             </CardContent>
         </Card>
-        <Fab sx={{ position : "absolute" , right : 0 , bottom : 0 , mr : 2 , mb : 2 }} color="primary" aria-label="add"
+        <Fab sx={{ position : "fixed" , right : 0 , bottom : 0 , mr : 2 , mb : 2 }} color="primary" aria-label="add"
             onClick={handleDownloadReportPDF}
         >
             <PictureAsPdf />

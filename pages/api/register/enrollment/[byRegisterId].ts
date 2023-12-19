@@ -44,7 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           id : register?.id || 0,
           fullName : register?.student.fullName || "",
           scheduleAdmision : register?.scheduleAdmision || "",
-          dateAdmision : register?.student.admision || "",
+          dateAdmision : register? `${register?.curricular.career.name.substring(0,3).toUpperCase()} - ${register?.dateStart.toLocaleString('es-ES', { month: 'long' }).toUpperCase()} ${register?.dateStart.getFullYear()}` : "",
           curricularId : register?.curricularId || 0,
           curricularName : register?.curricular?.code || "",
           courses : []

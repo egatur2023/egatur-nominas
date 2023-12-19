@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return {
       id : register.id,
       fullName : register.student.fullName,
-      dateAdmision : register.student.admision,
+      dateAdmision : `${register?.curricular.career.name.substring(0,3).toUpperCase()} - ${register?.dateStart.toLocaleString('es-ES', { month: 'long' }).toUpperCase()} ${register?.dateStart.getFullYear()}`,
       careerName : register.curricular.career.name,
       curricularName : register.curricular.code,
       dateStart : DateTime.fromJSDate(register.dateStart).toUTC().toISODate(),

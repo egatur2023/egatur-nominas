@@ -1,5 +1,5 @@
 import { DtoResRequestsForAdmin, DtoResRequestsForSuper } from 'resources/types'
-import create from 'zustand'
+import {create} from 'zustand'
 
 type StoreRequest = {
     isOpenDialogCreate : boolean

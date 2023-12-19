@@ -1,4 +1,4 @@
-import create from 'zustand'
+import {create} from 'zustand'
 import { DtoDataReportRow, DtoFilterAttendance } from "resources/types";
 
 type StoreAttendance = {

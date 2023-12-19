@@ -8,11 +8,11 @@ import { useStoreReport } from "resources/local/store.attendance"
 export default function FilterAttendance() {
 
     const {careerId, dateStart, dateEnd, setFilters} = useStoreReport()
-    
+
     const { data: careers, isLoading: isCareersLoading } = useQuery<Career[]>(["careers"], async () => API.getCareers(), {
         initialData : []
     })
-    
+
 
     return (
         <>

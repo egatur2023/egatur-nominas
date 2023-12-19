@@ -1,4 +1,4 @@
-import create from "zustand";
+import {create} from "zustand";
 
 import { Course, Module, Room } from "prisma/prisma-client"
 import { ScheduleType } from "resources/types";

@@ -60,7 +60,7 @@ export async function filterByCurricularId({ curricularId , dateStart , dateEnd 
         register.subscriptionsModule.forEach( subM =>
             subM.subscriptionsRoom.forEach(subRoom => response.push({
                     studentFullName : register.student.fullName,
-                    admision : register.student.admision,
+                    admision : `${register?.curricular.career.name.substring(0,3).toUpperCase()} - ${register?.dateStart.toLocaleString('es-ES', { month: 'long' }).toUpperCase()} ${register?.dateStart.getFullYear()}`,
                     schedule : subRoom.room.schedule,
                     careerName : register.curricular.career.name,
                     curricularName : register.curricular.code,
@@ -127,7 +127,7 @@ export async function filterByCareerId({ careerId , dateStart , dateEnd } : DtoB
         register.subscriptionsModule.forEach( subM =>
             subM.subscriptionsRoom.forEach(subRoom => response.push({
                     studentFullName : register.student.fullName,
-                    admision : register.student.admision,
+                    admision : `${register?.curricular.career.name.substring(0,3).toUpperCase()} - ${register?.dateStart.toLocaleString('es-ES', { month: 'long' }).toUpperCase()} ${register?.dateStart.getFullYear()}`,
                     schedule : subRoom.room.schedule,
                     careerName : register.curricular.career.name,
                     curricularName : register.curricular.code,
@@ -194,7 +194,7 @@ export async function filterByAdmision({ admision , dateStart , dateEnd } : DtoB
         register.subscriptionsModule.forEach( subM =>
             subM.subscriptionsRoom.forEach(subRoom => response.push({
                     studentFullName : register.student.fullName,
-                    admision : register.student.admision,
+                    admision : `${register?.curricular.career.name.substring(0,3).toUpperCase()} - ${register?.dateStart.toLocaleString('es-ES', { month: 'long' }).toUpperCase()} ${register?.dateStart.getFullYear()}`,
                     schedule : subRoom.room.schedule,
                     careerName : register.curricular.career.name,
                     curricularName : register.curricular.code,
@@ -212,7 +212,7 @@ export async function filterByAdmisionAndCareerId({ admision ,careerId, dateStar
     const registers = await prisma.register.findMany({
         where : {
             curricular : {
-                careerId: careerId,     
+                careerId: careerId,
             },
             student:{
                 admision: admision,
@@ -263,7 +263,7 @@ export async function filterByAdmisionAndCareerId({ admision ,careerId, dateStar
         register.subscriptionsModule.forEach( subM =>
             subM.subscriptionsRoom.forEach(subRoom => response.push({
                     studentFullName : register.student.fullName,
-                    admision : register.student.admision,
+                    admision : `${register?.curricular.career.name.substring(0,3).toUpperCase()} - ${register?.dateStart.toLocaleString('es-ES', { month: 'long' }).toUpperCase()} ${register?.dateStart.getFullYear()}`,
                     schedule : subRoom.room.schedule,
                     careerName : register.curricular.career.name,
                     curricularName : register.curricular.code,
@@ -330,7 +330,7 @@ export async function filterByCarrerIdAndCurricularId({ curricularId, careerId ,
         register.subscriptionsModule.forEach( subM =>
             subM.subscriptionsRoom.forEach(subRoom => response.push({
                     studentFullName : register.student.fullName,
-                    admision : register.student.admision,
+                    admision : `${register?.curricular.career.name.substring(0,3).toUpperCase()} - ${register?.dateStart.toLocaleString('es-ES', { month: 'long' }).toUpperCase()} ${register?.dateStart.getFullYear()}`,
                     schedule : subRoom.room.schedule,
                     careerName : register.curricular.career.name,
                     curricularName : register.curricular.code,
