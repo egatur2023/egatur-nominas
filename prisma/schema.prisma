@@ -13,6 +13,8 @@ model Career{
     name                    String   @unique
     curricularStructures    CurricularStructure[]
     @@index([name])
+
+    @@map("career")
 }
 
 model CurricularStructure{
@@ -26,6 +28,7 @@ model CurricularStructure{
     modules     Module[]
     registers   Register[]
 
+    @@map("curricularstructure")
 }
 
 model Module {
@@ -36,6 +39,7 @@ model Module {
   courses                   Course[]
   subscriptionsModule       SubscriptionModule[]
   @@index([name])
+  @@map("module")
 }
 
 model Course {
@@ -47,6 +51,7 @@ model Course {
   module                    Module   @relation(fields: [moduleId], references: [id])
   rooms                     Room[]
   @@index([name])
+    @@map("course")
 }
 
 model Student {
@@ -59,6 +64,7 @@ model Student {
     dateEnd                   DateTime?
     admision                  String
     registers                 Register[]
+    @@map("student")
 }
 
 model Teacher{
@@ -68,6 +74,7 @@ model Teacher{
     dni             String  @unique
     rooms           Room[]
     @@index([fullName])
+    @@map("teacher")
 }
 
 model User {
@@ -79,6 +86,7 @@ model User {
   requests    Request[]
   @@index([email])
 //   @@index([password])
+    @@map("user")
 }
 
 model Register {
@@ -92,6 +100,7 @@ model Register {
     curricular              CurricularStructure     @relation(fields: [curricularId],references: [id])
     subscriptionsModule     SubscriptionModule[]
     observations            String                  @db.Text @default("")
+    @@map("register")
 }
 
 model SubscriptionModule {
@@ -101,6 +110,7 @@ model SubscriptionModule {
     module          Module      @relation(fields: [moduleId] , references: [id])
     moduleId        Int
     subscriptionsRoom SubscriptionRoom[]
+    @@map("subscriptionmodule")
 }
 
 model SubscriptionRoom {
@@ -114,6 +124,8 @@ model SubscriptionRoom {
     attendances               Attendance[]
     requests                  Request[]
     quantityUpdated           Int
+
+    @@map("subscriptionroom")
 }
 
 model Room {
@@ -131,6 +143,7 @@ model Room {
   subscriptions   SubscriptionRoom[]
   section         String        @default("")
   frecuency       String //(L M MI J V S D) => ( LMiV )
+  @@map("room")
 }
 
 model Attendance {
@@ -140,6 +153,7 @@ model Attendance {
     subscriptionRoomId  Int
     stateAttendance     AttendanceState     @default(PENDIENTE)
     observation         String  @db.Text
+    @@map("attendance")
 }
 
 model Request {
@@ -154,6 +168,7 @@ model Request {
     subscriptionRoom        SubscriptionRoom @relation(fields: [subscriptionRoomId] , references: [id])
     subscriptionRoomId      Int
     reason                  String  @db.Text
+    @@map("request")
 }
 
 enum AttendanceState {
