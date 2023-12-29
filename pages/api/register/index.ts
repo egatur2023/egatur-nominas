@@ -25,7 +25,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       curricularName : register.curricular.code,
       dateStart : DateTime.fromJSDate(register.dateStart).toUTC().toISODate(),
       dateEnd : register?.dateEnd ?  DateTime.fromJSDate(register?.dateEnd).toUTC().toISODate() : "",
-      scheduleAdmision : register.scheduleAdmision
+      scheduleAdmision : register.scheduleAdmision,
+      observation : register.observations
     }
   })
   return res.status(200).json(registerFlat)

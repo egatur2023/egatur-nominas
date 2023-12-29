@@ -6,7 +6,8 @@ import { useMutation, useQuery , useQueryClient } from '@tanstack/react-query';
 import DialogFullScreen from "../dialog.fullscreen";
 import { ScheduleType } from "resources/types";
 import { useStoreEnrollment } from "resources/local/store.enrollment";
-
+import { LoadingButton } from "@mui/lab";
+import SaveIcon from '@mui/icons-material/Save';
 
 type PropsDialogCreateSubRoom = {
     curricular : { id : number , code : string , registerId : number }
@@ -99,6 +100,7 @@ export default function DialogCreateSubRoom({curricular , enrolledSubRooms , han
     const mutation = useMutation(API.postSubRoom,{
         onSuccess(){
             qc.invalidateQueries(["api/register/enrollment/byid"])
+            handleClose()//close and clear all toEnrollsSub
         }
     })
     const { currentModule , currentCourse , toEnrollSubModules , setPanelName , setModules , unenrollRoom } = useStoreEnrollment()
@@ -122,7 +124,7 @@ export default function DialogCreateSubRoom({curricular , enrolledSubRooms , han
 
     const handleSubmit = () => {
         mutation.mutate({ registerId : curricular.registerId , toEnrollSubModules : toEnrollSubModules })
-        handleClose()//close and clear all toEnrollsSub
+
     }
 
 
@@ -135,8 +137,20 @@ export default function DialogCreateSubRoom({curricular , enrolledSubRooms , han
                 handleClose={handleClose}
                 isOpen={isOpen}
                 title={curricular?.code || "Curricula"}
-                textSave="Matricular"
-                handleSave={handleSubmit}
+                // textSave="Matricular"
+                // handleSave={handleSubmit}
+                renderButton={
+                    <LoadingButton
+                        variant="outlined"
+                        disabled={mutation.isLoading || toEnrollSubModules.length === 0}
+                        loading={mutation.isLoading}
+                        loadingPosition="start"
+                        startIcon={<SaveIcon />}
+                        onClick={handleSubmit}
+                        >
+                            Matricular
+                    </LoadingButton>
+                }
             >
 
         <Stack spacing={2} m={2}>

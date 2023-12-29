@@ -3,6 +3,11 @@ import { Prisma } from "prisma/prisma-client"
 import getCoursesByModuleId from "./services/course"
 import { getRequestForAdmin } from "./services/request"
 import getRoomsByCourseId from "./services/room"
+import { getAttendancesBySubscriptionRoomId } from "./services/attendance/getAttendancesBySubscriptionRoomId"
+import { getCourseBySubModuleIdAndName } from "./services/course/getCourseBySubModuleIdAndName"
+import { getSubscriptionRoomById } from "./services/subroom/getSubscriptionRoomById"
+import { getRoomsByCareer } from "./services/subroom/getRoomsByCareer"
+import { getSubscriptionsRoomByRoomId } from "./services/subroom/getSubscriptionsRoomByRoomId"
 
 export type DtoCreateRequest = {
     reason : string
@@ -65,6 +70,17 @@ export declare type DtoCreateSubModule = {
 export declare type DtoCreateSubRoom = {
     courseName : string
     roomId : number
+}
+
+export declare type DtoUpdateAttendance = {
+    attendanceId : number,
+    date : string,
+    stateAttendance : AttendanceState,
+    observation : string
+}
+export declare type DtoUpdateRegister = {
+    registerId : number
+    observation : string
 }
 
 export declare type ScheduleType  = "MAÑANA" |  "TARDE" | "NOCHE" | "VACIO"
@@ -231,7 +247,12 @@ export type DtoFilterReport = {
     dateStart : string
     dateEnd : string
 }
-
+export type DtoFilterAdmissions = {
+    careerId : number
+    admision : string
+    dateStart : string
+    dateEnd : string
+}
 
 export type DtoFilterAttendance = {
     careerId: number
@@ -283,6 +304,7 @@ export type DtoResRegister = {
     dateStart : string
     dateEnd : string
     scheduleAdmision : string
+    observation : string
 }
 
 export type DtoDataReportRow = {
@@ -343,12 +365,24 @@ export type DtoResRequestsForSuper = {
     subRoomId : number
 }
 
+export type ResponseAttendancesBySubRoomId = {
+    studentFullname: string;
+    dateAdmision: string;
+    schedule: string;
+    attendances: Attendance[];
+}
+
 // EXTENDED TYPES PRISMA
 
 export type RegisterWithRelations1 = Prisma.PromiseReturnType<typeof getRegisterWithRelations1>
 export type RoomsByCourseId1 = Prisma.PromiseReturnType<typeof getRoomsByCourseId>
 export type CoursesByModuleId1 = Prisma.PromiseReturnType<typeof getCoursesByModuleId>
 export type RequestsForAdmin = Prisma.PromiseReturnType<typeof getRequestForAdmin>
+export type ResultGetAttendancesBySubscriptionRoomId = Prisma.PromiseReturnType<typeof getAttendancesBySubscriptionRoomId>
+export type ResultGetCourseBySubModuleIdAndName = Prisma.PromiseReturnType<typeof getCourseBySubModuleIdAndName>
+export type ResultGetSubscriptionRoomById = Prisma.PromiseReturnType<typeof getSubscriptionRoomById>
+export type ResultGetRoomsByCareer = Prisma.PromiseReturnType<typeof getRoomsByCareer>
+export type ResultGetSubscriptionsRoomByRoomId = Prisma.PromiseReturnType<typeof getSubscriptionsRoomByRoomId>
 
 //const type
 

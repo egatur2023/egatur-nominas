@@ -6,7 +6,7 @@ import { DtoResRegisterSubRoom, DtoResRegisterWithSubRooms } from "resources/typ
 import { Column, ColumnDef, createColumnHelper, FilterFn, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, RowData, SortingFn, sortingFns, useReactTable } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { RankingInfo,rankItem} from '@tanstack/match-sorter-utils'
-import { Check, Close, Edit, FirstPage, KeyboardArrowLeft, KeyboardArrowRight, LastPage } from "@mui/icons-material";
+import { Check, Close, Edit, FirstPage, KeyboardArrowLeft, KeyboardArrowRight, LastPage, PanoramaFishEye, RemoveRedEye } from "@mui/icons-material";
 import * as yup from 'yup'
 import { useRouter } from "next/router";
 import DataTable from "./data.table";
@@ -115,7 +115,7 @@ export default function OneRegister({register} : {register : DtoResRegisterWithS
             }),
             columnHelper.accessor(() => null,{
                 id : "Edit",
-                header :"Acciones",
+                header :"Editar Nota",
                 enableColumnFilter : false,
                 enableGlobalFilter : false,
                 cell(props) {
@@ -144,6 +144,24 @@ export default function OneRegister({register} : {register : DtoResRegisterWithS
                             setCourseEdit(props.row.original)
                         }}>
                             <Edit fontSize="small"/>
+                        </IconButton>
+                    )
+                },
+            }),
+            columnHelper.accessor(() => null,{
+                id : "assistance",
+                header :"Asistencia",
+                enableColumnFilter : false,
+                enableGlobalFilter : false,
+                cell(props) {
+                    return (
+                        <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={()=> {
+                                router.push(`/app/admin/register/${register?.id}/attendance/${props.row.original.subRoomId}`)
+                        }}>
+                            <RemoveRedEye fontSize="small"/>
                         </IconButton>
                     )
                 },

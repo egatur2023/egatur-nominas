@@ -1,5 +1,5 @@
 import API from "@api";
-import { AssignmentInd, DriveFileRenameOutline, Print, Topic } from "@mui/icons-material";
+import { AssignmentInd, DriveFileRenameOutline, Print, RemoveRedEye, Topic } from "@mui/icons-material";
 import { Button, CircularProgress, Fade, IconButton, Tooltip, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
@@ -17,6 +17,9 @@ import DataTable from "resources/components/data.table";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { useMemo } from "react";
 import { useStoreRegister } from "resources/local/store.register";
+import DialogEditObservationRegister from "resources/components/register/dialog.edit.observation";
+import autoTable from 'jspdf-autotable'
+import { urlContentToDataUri } from "resources/functions/helpers.frontend";
 
 export default function Register() {
 
@@ -24,7 +27,7 @@ export default function Register() {
         format: "a4",
         unit: "px"
     })
-    const { setOpenDialogEditRegister, setOpenDialogRegister, setRegisterToEdit } = useStoreRegister()
+    const { setOpenDialogRegister , setRegisterToEditObservation , setOpendialogEditObservation } = useStoreRegister()
     const router = useRouter()
     const [registerId , setRegisterId] = useState<number>(0)
     useQuery<DtoResRegisterWithSubRooms>(
@@ -32,14 +35,59 @@ export default function Register() {
         async () => API.getRegisterById(registerId),
         {
             enabled: registerId > 0,
-            onSuccess(data) {
-                filePDF.setFontSize(1)
-                filePDF.html(renderToStaticMarkup(<TemplateRegistersPDF register={data}/>),{
-                    margin:  [20,20,20,20] ,
-                    callback : () => {
-                        filePDF.save("registro_alumno.pdf")
-                    }
+            onSuccess : async (register) => {
+                var logoBase64 = await urlContentToDataUri("/logo.png")
+
+                autoTable(filePDF,{
+                    body: [
+                      [{ content : '', styles : { minCellWidth : 160 } }, {content: 'Record Académico', styles: {halign: 'center'  , minCellHeight : 40 , fontSize : 32 , fontStyle : 'bold'}}],
+                    ],
+                    didDrawCell: (data) => {
+                        if (data.section === 'body' && data.column.index === 0) {
+                            filePDF.addImage(logoBase64 as string, 'PNG', data.cell.x + 2, data.cell.y + 2, 100, 30)
+                          }
+                    },
+                    theme : 'plain',
                 })
+
+                autoTable(filePDF,{
+                    body: [
+                      [{ content : 'Nombres y Apellidos', }, {content: register.fullName, styles: {}}],
+                      [{ content : 'Admisión', }, {content: register.dateAdmision, styles: {}}],
+                      [{ content : 'Malla curricular', }, {content: register.scheduleAdmision, styles: {}}],
+                    ],
+                    theme : 'plain',
+                })
+
+                autoTable(filePDF,{
+                    head : [[
+                        {content : 'N°' , styles : { fillColor : "#0066bb" } },
+                        { content : 'Curso' , styles : { fillColor : "#0066bb" , halign : 'center'} },
+                        { content : 'Tipo' , styles : { fillColor : "#0066bb" , halign : 'center'} },
+                        { content : 'Modulo' , styles : { fillColor : "#0066bb" , halign : 'center'} },
+                        { content : 'Docente' , styles : { fillColor : "#0066bb" , halign : 'center'} },
+                        { content : 'Fecha Inicio' , styles : { fillColor : "#0066bb" , halign : 'center'} },
+                        { content : 'Fecha Fin' , styles : { fillColor : "#0066bb" , halign : 'center'} },
+                        { content : 'Nota' , styles : { fillColor : "#0066bb" , halign : 'center'} },
+                    ]],
+                    body : register.subRooms.map((subR, index) => (
+                        [
+                            ++index,
+                            subR.courseName,
+                            subR.typeCourse,
+                            subR.moduleName,
+                            subR.teacherName,
+                            subR.dateStart ,
+                            subR.dateEnd,
+                            subR.score,
+                        ]
+                    )),
+                    theme : 'grid',
+                })
+
+
+
+                filePDF.save("registro_alumno.pdf")
                 setRegisterId(0)
             },
         }
@@ -48,6 +96,11 @@ export default function Register() {
 
     const handleOpen = () => {
         setOpenDialogRegister(true)
+    }
+
+    const handleEditObservation = (register: DtoResRegister) => {
+        setRegisterToEditObservation(register)
+        setOpendialogEditObservation(true)
     }
 
     const handleActionDetailRegister = (registerId: any) => {
@@ -86,17 +139,17 @@ export default function Register() {
             header : "Curricula"
         }),
         columnHelper.accessor("dateStart",{
-            header : "Fecha Inicio",
+            header : "Fecha de matrícula",
             cell(props) {
                 return DateTime.fromISO(props.getValue()).toUTC().toISODate()
             },
         }),
-        columnHelper.accessor("dateEnd",{
-            header : "Fecha Término",
-            cell(props) {
-                return props.getValue() != "" ? DateTime.fromISO(props.getValue()).toUTC().toISODate() : props.getValue()
-            },
-        }),
+        // columnHelper.accessor("dateEnd",{
+        //     header : "Fecha Término",
+        //     cell(props) {
+        //         return props.getValue() != "" ? DateTime.fromISO(props.getValue()).toUTC().toISODate() : props.getValue()
+        //     },
+        // }),
         columnHelper.accessor(()=> 0,{
             id : "Actions",
             header : "Acciones",
@@ -135,6 +188,16 @@ export default function Register() {
                                 <Print fontSize="small" />
                             </IconButton>
                         </Tooltip>
+                        <Tooltip
+                            title="Observación"
+                            placement="top"
+                            TransitionComponent={Fade}
+                            TransitionProps={{ timeout: 400 }}
+                            arrow>
+                            <IconButton size="large" onClick={() => handleEditObservation(props.row.original) }>
+                                <RemoveRedEye fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
                     </Box>
                 )
             },
@@ -158,6 +221,7 @@ export default function Register() {
             <DialogCreateRegister />
             <DialogCreateStudent />
             <DialogEditRegister />
+            <DialogEditObservationRegister />
             <Box
                 marginTop={"2rem"}
                 marginX={"2rem"}

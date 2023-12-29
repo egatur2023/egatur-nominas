@@ -41,5 +41,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
     }
 
-    return res.status(404).json({message : `No se pudo encontrar un registro para ${byid}}`})
+    return res.status(200).json({message : `No se pudo encontrar un registro para ${byid}}`})
 }

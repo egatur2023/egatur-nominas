@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { DtoCreateCareer, DtoCreateCourse, DtoCreateCurricular, DtoCreateModule, DtoCreateRegister, DtoCreateRoom, DtoCreateStudent, DtoCreateSubModuleWithRooms, DtoEditCareer, DtoEditCourse, DtoEditCourseName, DtoEditCurricular, DtoEditModule, DtoEditRoom, DtoEditSubRoomNameAndScore, DtoEditSubRoom, DtoFilterReport, DtoEditRegister, DtoCreateTeacher, DtoCreateRequest, DtoEditRequestAdmin, DtoEditTeacher } from './types';
+import { DtoCreateCareer, DtoCreateCourse, DtoCreateCurricular, DtoCreateModule, DtoCreateRegister, DtoCreateRoom, DtoCreateStudent, DtoCreateSubModuleWithRooms, DtoEditCareer, DtoEditCourse, DtoEditCourseName, DtoEditCurricular, DtoEditModule, DtoEditRoom, DtoEditSubRoomNameAndScore, DtoEditSubRoom, DtoFilterReport, DtoEditRegister, DtoCreateTeacher, DtoCreateRequest, DtoEditRequestAdmin, DtoEditTeacher, DtoUpdateAttendance, DtoFilterAdmissions, DtoUpdateRegister } from './types';
 import { saveAs } from 'file-saver';
 
 export const instanceAxios = axios.create({
@@ -97,7 +97,7 @@ export default abstract class API {
 
     static async getRegisterById(byid: number) {
         try {
-            const res = await instanceAxios.get(`/register/byid/${byid}`);
+            const res = await instanceAxios.get(`/register/${byid}`);
             return res.data;
 
         } catch (error: any) {
@@ -135,6 +135,35 @@ export default abstract class API {
     static async getModulesByCurricularId(curricularId: number) {
         try {
             const res = await instanceAxios.get(`/module/bycurricularid/${curricularId}`)
+            return res.data;
+
+        } catch (error: any) {
+            console.log(error)
+        }
+    }
+
+    static async fetchAdmissionsByRoomId(roomId: number) {
+        try {
+            const res = await instanceAxios.get(`/admission/${roomId}`);
+            return res.data;
+
+        } catch (error: any) {
+            console.log(error)
+        }
+    }
+
+    static async fetchGetAttendancesBySubRoomId(registerId : number ,subRoomId: number) {
+        try {
+            const res = await instanceAxios.get(`/register/${registerId}/attendance/${subRoomId}`);
+            return res.data;
+
+        } catch (error: any) {
+            console.log(error)
+        }
+    }
+    static async postFilterAdmissions(filters : DtoFilterAdmissions) {
+        try {
+            const res = await instanceAxios.post(`/admission/filter`,filters);
             return res.data;
 
         } catch (error: any) {
@@ -202,6 +231,14 @@ export default abstract class API {
     static async putRequestSuper(form: FormData) {
         return await instanceAxios.post('/request/super/update', form)
     }
+    static async putObservationRegister(register  : DtoUpdateRegister) {
+        try {
+            const res = await instanceAxios.post('/register/observation', register)
+            return res.data
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
 
     static async putRoom(room: DtoEditRoom) {
@@ -215,6 +252,14 @@ export default abstract class API {
     static async putSubRoom(subRoom: DtoEditSubRoom) {
         try {
             const res = await instanceAxios.post('/subroom/update', subRoom);
+            return res.data;
+        } catch (error: any) {
+            console.log(error)
+        }
+    }
+    static async putAssistanceOnSubRoom(values: DtoUpdateAttendance) {
+        try {
+            const res = await instanceAxios.post('/attendance/update', values);
             return res.data;
         } catch (error: any) {
             console.log(error)

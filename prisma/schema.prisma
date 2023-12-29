@@ -1,12 +1,11 @@
 datasource db {
   url = env("DATABASE_URL")
   provider = "mysql"
-  referentialIntegrity = "prisma"
+  relationMode = "prisma"
 }
 
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["referentialIntegrity"]
 }
 
 model Career{
@@ -92,6 +91,7 @@ model Register {
     student                 Student                 @relation(fields: [studentId],references: [id])
     curricular              CurricularStructure     @relation(fields: [curricularId],references: [id])
     subscriptionsModule     SubscriptionModule[]
+    observations            String                  @db.Text @default("")
 }
 
 model SubscriptionModule {
@@ -139,6 +139,7 @@ model Attendance {
     subscriptionRoom    SubscriptionRoom @relation(fields: [subscriptionRoomId] , references: [id])
     subscriptionRoomId  Int
     stateAttendance     AttendanceState     @default(PENDIENTE)
+    observation         String  @db.Text
 }
 
 model Request {
@@ -157,9 +158,12 @@ model Request {
 
 enum AttendanceState {
     PENDIENTE
-    PRESENTE
-    FALTA
-    JUSTIFICADO
+    ASISTIO
+    FALTO
+    TARDANZA
+    JUSTIFICADA
+    NO_VINO_EL_DOCENTE
+    FERIADO
 }
 
 enum StateUpdate {

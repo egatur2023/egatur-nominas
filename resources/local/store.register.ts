@@ -5,12 +5,16 @@ type StoreRegister = {
     isOpenDialogCreateRegister : boolean
     isOpenDialogStudent : boolean
     isOpenDialogEditRegister : boolean
+    dialogObservationIsOpen : boolean,
     registerToEdit : DtoResRegister | null
+    registerEditObservation : DtoResRegister | null
 
     setOpenDialogStudent : (isOpen : boolean) => void
     setOpenDialogRegister : (isOpen : boolean) => void
     setOpenDialogEditRegister : (isOpen : boolean) => void
+    setOpendialogEditObservation : (isOpen : boolean) => void
     setRegisterToEdit : (register : DtoResRegister) => void
+    setRegisterToEditObservation : (register : DtoResRegister | null) => void
 }
 
 export const useStoreRegister = create<StoreRegister>(set => ({
@@ -18,6 +22,8 @@ export const useStoreRegister = create<StoreRegister>(set => ({
     isOpenDialogCreateRegister : false,
     isOpenDialogEditRegister : false,
     registerToEdit : null,
+    registerEditObservation : null,
+    dialogObservationIsOpen : false,
 
     setOpenDialogStudent (isOpen) {
         set(state => ({...state , isOpenDialogStudent : isOpen }))
@@ -30,5 +36,11 @@ export const useStoreRegister = create<StoreRegister>(set => ({
     },
     setRegisterToEdit(register){
         set(state => ({...state , registerToEdit : register}))
+    },
+    setRegisterToEditObservation(register : DtoResRegister | null){
+        set(state => ({...state , registerEditObservation : register}))
+    },
+    setOpendialogEditObservation(isOpen : boolean){
+        set(state => ({...state , dialogObservationIsOpen : isOpen}))
     }
 }))
