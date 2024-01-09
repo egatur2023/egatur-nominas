@@ -25,11 +25,11 @@ export const itemsSidebarAdmin : AreaSidebar[] =
                     title : 'Solicitudes de cambio de nota',
                     path : '/app/admin/request',
                 },
-                // {
-                //     name : 'Admisiones',
-                //     title : 'Admisiones2',
-                //     path : '/app/admin/admission',
-                // },
+                {
+                    name : 'Admisiones',
+                    title : 'Admisiones2',
+                    path : '/app/admin/admission',
+                },
             ]
 
         },
