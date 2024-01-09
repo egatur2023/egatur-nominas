@@ -127,7 +127,7 @@ export async function filterByCareerId({ careerId , dateStart , dateEnd } : DtoB
         register.subscriptionsModule.forEach( subM =>
             subM.subscriptionsRoom.forEach(subRoom => response.push({
                     studentFullName : register.student.fullName,
-                    admision : register?.curricular.career.name == "Barismo" ? `BRM - ${register?.dateStart.toLocaleString('es-ES', { month: 'long' }).toUpperCase()} ${register?.dateStart.getFullYear()}` : `${register?.curricular.career.name.substring(0,3).toUpperCase()} - ${register?.dateStart.toLocaleString('es-ES', { month: 'long' }).toUpperCase()} ${register?.dateStart.getFullYear()}`,,
+                    admision : register?.curricular.career.name == "Barismo" ? `BRM - ${register?.dateStart.toLocaleString('es-ES', { month: 'long' }).toUpperCase()} ${register?.dateStart.getFullYear()}` : `${register?.curricular.career.name.substring(0,3).toUpperCase()} - ${register?.dateStart.toLocaleString('es-ES', { month: 'long' }).toUpperCase()} ${register?.dateStart.getFullYear()}`,
                     schedule : subRoom.room.schedule,
                     careerName : register.curricular.career.name,
                     curricularName : register.curricular.code,
