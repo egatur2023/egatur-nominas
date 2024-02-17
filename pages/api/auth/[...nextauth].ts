@@ -18,11 +18,13 @@ export default NextAuth ({
     callbacks: {
         jwt: async (params) => {
             const { token , user} = params
+            //@ts-ignore
             user && (token.user = user)
             return token
         },
         session: async (params) => {
             const { session, token } = params
+            //@ts-ignore
             session.user = token.user
             const userAuthenticated = await loginUseCase({ email : String(session?.user?.email) })
 

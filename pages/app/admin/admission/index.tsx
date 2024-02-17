@@ -40,7 +40,7 @@ export default function AdmissionPage(){
         },
     })
 
-    const handleClickRoom = (roomId : number) => {
+    const handleClickRoom = (roomId : string) => {
         router.push(`/app/admin/admission/${roomId}`)
     }
 
