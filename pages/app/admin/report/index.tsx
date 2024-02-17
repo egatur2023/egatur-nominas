@@ -13,13 +13,13 @@ import { useStoreReport } from "resources/local/store.report";
 
 export default function ReportFilter() {
 
-    const filePDF = useMemo(() => (
+    const filePDF = (
         new jsPDF({
             format: "a4",
             unit: "px",
             orientation: "landscape",
         })
-    ),[])
+    )
     const { dataReport1 } = useStoreReport()
 
     let date = new Date()

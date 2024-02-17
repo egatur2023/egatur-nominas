@@ -17,10 +17,13 @@ import { useMemo } from "react";
 import { DtoResRegisterRowCourse } from "resources/types";
 import { useStoreRegister } from "resources/local/store.register";
 import { useStoreEnrollment } from "resources/local/store.enrollment";
+import { hasPermission } from "resources/functions/helpers.frontend";
+import { useSession } from "next-auth/react";
 
 export default function Detail() {
 
     const router = useRouter()
+    const { data : session } = useSession()
     const { clearEnrollRooms } = useStoreEnrollment()
     const byRegisterId = parseInt(router.query.byRegisterId as string) || 0
     const [rooms , setRooms] = useState<Room[]>([])
@@ -39,6 +42,8 @@ export default function Detail() {
             },
         }
     )
+    const isAuthorizedForCreate = hasPermission(session?.user?.role.permissions || [], "Matrícula.create")
+    const isAuthorizedForUpdate = hasPermission(session?.user?.role.permissions || [], "Matrícula.update")
 
     const handleOpenRooms = (course : DtoResRegisterRowCourse) => {
         setRooms(course.rooms)
@@ -64,17 +69,26 @@ export default function Detail() {
         columnHelper.accessor("roomName",{
             header : "Aula"
         }),
-        columnHelper.accessor(() => 0,{
+        columnHelper.accessor(() => null,{
+            id : "Editar",
             header : "Editar",
+            enableGlobalFilter : false,
             cell(props) {
                 return (
-                    <Button variant="outlined" onClick={ () => handleOpenRooms(props.row.original) }>
-                        Reasignar
-                    </Button>
+                    <Stack direction="row">
+                        {
+                            isAuthorizedForUpdate &&
+                            <Button variant="outlined" onClick={ () => handleOpenRooms(props.row.original) }>
+                                Reasignar
+                            </Button>
+                        }
+
+                    </Stack>
                 )
             },
         }),
-    ],[])
+    ],[isAuthorizedForUpdate])
+
 
 
     const handleCreateSubRoom = (curricularId : number) =>{
@@ -88,7 +102,7 @@ export default function Detail() {
 
 
 
-    if(!byRegisterId) return <>404</>;
+    // if(!byRegisterId) return <>404</>;
 
     if (isLoading) {
         return <Box
@@ -145,12 +159,15 @@ export default function Detail() {
             </Stack>
 
             <Box display="flex" justifyContent="flex-end">
-                <Button
-                    variant="outlined"
-                    onClick={()=> handleCreateSubRoom(register?.curricularId)}
-                >
-                    <Add fontSize="small" sx={{mr : 1}}/> Nuevo curso
-                </Button>
+                {
+                    isAuthorizedForCreate &&
+                    <Button
+                        variant="outlined"
+                        onClick={()=> handleCreateSubRoom(register?.curricularId)}
+                    >
+                        <Add fontSize="small" sx={{mr : 1}}/> Nuevo curso
+                    </Button>
+                }
             </Box>
             <DataTable
                 data={courses}

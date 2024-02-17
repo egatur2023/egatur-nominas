@@ -16,28 +16,31 @@ export function hasPermission(permissions : (Permission & { module : ModuleSyste
     return permissions.find( permission => {
         const pagePermission = stringPermission.toLowerCase()
         let userPermission : string = ""
-        console.log(`------FINDING =>${stringPermission}`)
+        let isAuthorized = false
+        console.log(`------FINDING => ${stringPermission} { c : ${permission.create} ,r : ${permission.read} ,u : ${permission.update},d : ${permission.delete}}`,)
         if(stringPermission.includes("read")){
             userPermission = `${permission.module.name}.read`.toLowerCase()
-            // console.log(`found =>${permission.module.name}.read`,permission.read)
-           return pagePermission.includes(userPermission) && permission.read
+            isAuthorized = permission.read
         }
         if(stringPermission.includes("create")){
             userPermission = `${permission.module.name}.create`.toLowerCase()
-            // console.log(`found =>${permission.module.name}.create`,permission.create)
-            return pagePermission.includes(userPermission) && permission.create
+            isAuthorized = permission.create
         }
         if(stringPermission.includes("update")){
             userPermission = `${permission.module.name}.update`.toLowerCase()
-            // console.log(`found =>${permission.module.name}.update`,permission.update)
-            return pagePermission.includes(userPermission) && permission.update
+            isAuthorized = permission.update
         }
         if(stringPermission.includes("delete")){
             userPermission = `${permission.module.name}.delete`.toLowerCase()
-            // console.log(`found =>${permission.module.name}.delete`,permission.delete)
-            return pagePermission.includes(userPermission) && permission.delete
+            isAuthorized = permission.delete
         }
-        // console.log({pagePermission , userPermission , isT : permission.read})
+        const result = pagePermission.toLowerCase() === userPermission
+        if(result && isAuthorized){
+            console.log(`found => (${isAuthorized})${pagePermission.toLowerCase() } === ${userPermission} [${result}]`)
+            return true
+        }else{
+            return false
+        }
 
     })
 }

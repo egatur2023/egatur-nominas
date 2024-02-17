@@ -4,11 +4,13 @@ import { Box, Button, CircularProgress, Fade, IconButton, Tooltip, Typography } 
 import { Teacher } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
 import DataTable from "resources/components/data.table";
 
 import DialogCreateTeacher from "resources/components/teacher/dialog.create";
 import DialogEditTeacher from "resources/components/teacher/dialog.edit.teacher";
+import { hasPermission } from "resources/functions/helpers.frontend";
 import { useStoreTeacher } from "resources/local/store.teacher";
 import { DtoEditTeacher, TeacherToEdit } from "resources/types";
 
@@ -19,6 +21,8 @@ export default function Index() {
     const { data: teachers, isLoading } = useQuery<Teacher[]>(["teachers"], async () => API.getTeachers(), {
         initialData: []
     })
+
+    const { data }= useSession()
 
     const { setIsOpenDialogCreate , setIsOpenDialogEdit  } = useStoreTeacher()
     const [teacherToEdit, setTeacherToEdit] = useState<TeacherToEdit>({
@@ -32,6 +36,9 @@ export default function Index() {
         setTeacherToEdit(teacherToEdit)
         setIsOpenDialogEdit(true);
     }
+
+    const isAuthorizedForUpdateTeacher = hasPermission(data?.user?.role.permissions || [], 'Docentes.update')
+    const isAuthorizedForCreateTeacher = hasPermission(data?.user?.role.permissions || [], 'Docentes.create')
     const columnHelper = createColumnHelper<Teacher>()
     //@ts-ignore
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,22 +63,26 @@ export default function Index() {
             cell(props) {
                 return (
                     <Box>
-                        <Tooltip
-                            title="Editar"
-                            placement="top"
-                            TransitionComponent={Fade}
-                            TransitionProps={{ timeout: 400 }}
-                            arrow>
-                            <IconButton sx={{ ml: 2 }} size="large" onClick={() => { handleEditTeacher(props.row.original)}}>
-                                <Edit fontSize="small" />
-                            </IconButton>
+                        {
+                            isAuthorizedForUpdateTeacher &&
+                            <Tooltip
+                                title="Editar"
+                                placement="top"
+                                TransitionComponent={Fade}
+                                TransitionProps={{ timeout: 400 }}
+                                arrow>
+                                <IconButton size="small" onClick={() => { handleEditTeacher(props.row.original)}}
+                                >
+                                    <Edit fontSize="small" />
+                                </IconButton>
 
-                        </Tooltip>
+                            </Tooltip>
+                        }
                     </Box>
                 )
             },
         }),
-    ], [])
+    ], [isAuthorizedForUpdateTeacher])
 
     if (isLoading) {
         return <Box
@@ -107,12 +118,15 @@ export default function Index() {
                         Registros de Docentes
                     </Typography>
 
-                    <Button
-                        variant="contained"
-                        onClick={() => setIsOpenDialogCreate(true)}
-                    >
-                        Agregar Docente
-                    </Button>
+                    {
+                        isAuthorizedForCreateTeacher &&
+                        <Button
+                            variant="contained"
+                            onClick={() => setIsOpenDialogCreate(true)}
+                        >
+                            Agregar Docente
+                        </Button>
+                    }
                 </Box>
 
                 <DataTable

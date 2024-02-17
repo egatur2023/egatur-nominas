@@ -11,6 +11,7 @@ import { useStoreRequest } from "resources/local/store.request";
 import { DtoCreateRequest } from "resources/types";
 import { schemaCreateRequest } from "resources/validation/schema.create.request";
 import DialogBasic from "../dialog.basic";
+import { LoadingButton } from "@mui/lab";
 
 
 export default function DialogCreateRequest({userId } : {userId : number }){
@@ -40,9 +41,10 @@ export default function DialogCreateRequest({userId } : {userId : number }){
     })
     const { values:request ,handleChange , handleSubmit , errors , touched , isSubmitting , setSubmitting , setFieldValue , resetForm  } = useFormik<DtoCreateRequest>({
         validationSchema : schemaCreateRequest,
+        enableReinitialize : subRoomId > 0,
         initialValues : {
             reason : "",
-            subRoomId : 0,
+            subRoomId : subRoomId || 0,
             userId : userId,
             date : DateTime.now().toUTC().toISODate(),
             doc1 : { name :"" , extension : ""},
@@ -50,7 +52,7 @@ export default function DialogCreateRequest({userId } : {userId : number }){
             doc3 : { name :"" , extension : ""},
         },
         async onSubmit(validatedRequest) {
-            setSubmitting(true)
+            // setSubmitting(true)
             const formRequest = new FormData()
             const composedRequest = JSON.stringify({...validatedRequest , subRoomId })
             formRequest.append("request", composedRequest )
@@ -61,15 +63,15 @@ export default function DialogCreateRequest({userId } : {userId : number }){
             mutation.mutate(formRequest)
         },
     })
-    const onChangeFile = async (e : React.ChangeEvent<HTMLInputElement> , property : string) => {
+    const onChangeFile = (e : React.ChangeEvent<HTMLInputElement> , property : string) => {
         if(!e.target.files) return ;
         const file = e.target.files[0];
         let fileName = file.name.split(".")
         let extension = fileName.pop()?.toUpperCase() || ""
-        await setFieldValue( property , { name : fileName.join() , extension })
+        setFieldValue( property , { name : fileName.join() , extension })
         setDocuments({...documents , [property] : file})
     }
-
+    console.log("render")
     return (
         <DialogBasic isOpen={isOpenDialogCreate} handleOpenDialog={(isOpen) => {
             resetForm()
@@ -85,7 +87,7 @@ export default function DialogCreateRequest({userId } : {userId : number }){
                             label="Documento 1"
                             name="doc1"
                             placeholder={request.doc1.name || "Carga un archivo por favor."}
-                            onChange={async(e) => await setFieldValue("doc1", { ...request.doc1 , name : String(e.target.value) } )}
+                            onChange={async(e) => setFieldValue("doc1", { ...request.doc1 , name : String(e.target.value) } )}
                             error={touched.doc1 && Boolean(errors.doc1)}
                             helperText={errors.doc1?.name || ""}
                             InputLabelProps={{
@@ -108,7 +110,7 @@ export default function DialogCreateRequest({userId } : {userId : number }){
                         <TextField
                             label="Documento 2"
                             placeholder={request.doc2.name || "Carga un archivo por favor."}
-                            onChange={async(e) => await setFieldValue("doc2", { ...request.doc2 , name : String(e.target.value) } )}
+                            onChange={async(e) => setFieldValue("doc2", { ...request.doc2 , name : String(e.target.value) } )}
                             InputLabelProps={{
                                 shrink : Boolean(request.doc2)
                             }}
@@ -129,7 +131,7 @@ export default function DialogCreateRequest({userId } : {userId : number }){
                         <TextField
                             label="Documento 3"
                             placeholder={request.doc3.name || "Carga un archivo por favor."}
-                            onChange={async(e) => await setFieldValue("doc3",{ ...request.doc3 , name : String(e.target.value) })}
+                            onChange={async(e) => setFieldValue("doc3",{ ...request.doc3 , name : String(e.target.value) })}
                             InputLabelProps={{
                                 shrink : Boolean(request.doc3)
                             }}
@@ -156,13 +158,13 @@ export default function DialogCreateRequest({userId } : {userId : number }){
                             </Alert>
                         }
                         <Box sx={{ display : "flex" , justifyContent : "flex-end" }}>
-                            <Button
+                            <LoadingButton
                                 variant="outlined"
-                                disabled={isSubmitting}
+                                loading={isSubmitting}
                                 onClick={(e) => {
-                                //@ts-ignore
-                                handleSubmit(e)
-                            }}>Enviar solicitud</Button>
+                                    // setSubmitting(true)
+                                    handleSubmit()
+                            }}>Enviar solicitud</LoadingButton>
                         </Box>
                     </Stack>
                 </CardContent>

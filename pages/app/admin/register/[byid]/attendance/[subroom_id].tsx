@@ -1,16 +1,18 @@
 import API from "@api"
 import { FileDownload, NavigateNext, NoteAlt } from "@mui/icons-material"
-import { Box, Breadcrumbs, Button, Chip, IconButton, Link, Stack, Typography } from "@mui/material"
+import { Box, Breadcrumbs, Button, Chip, IconButton, Link, Stack, Tooltip, Typography } from "@mui/material"
 import { Attendance } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import { DateTime } from "luxon"
+import { useSession } from "next-auth/react"
 import { useRouter } from "next/router"
 import { useMemo, useState } from "react"
 import AttendanceUpdate from "resources/components/attendance/attendance.update"
 import DataTable from "resources/components/data.table"
+import { hasPermission } from "resources/functions/helpers.frontend"
 import { useStoreAttendanceStudent } from "resources/local/store.attendance.student"
 import { ResponseAttendancesBySubRoomId } from "resources/types"
 
@@ -29,6 +31,7 @@ import { ResponseAttendancesBySubRoomId } from "resources/types"
 export default function AttendanceBySubscriptionRoomPage(){
 
     const router = useRouter()
+    const { data : session } = useSession()
     const registerId = parseInt(router.query.byid as string) || 0
     const subRoomId = parseInt(router.query.subroom_id as string) || 0
     const { setOpenDialogEditAttendance , setAttendanceToEdit , isOpenDialogEditAttendance , attendance } = useStoreAttendanceStudent()
@@ -87,6 +90,9 @@ export default function AttendanceBySubscriptionRoomPage(){
             }
         }
     )
+
+    const isAuthoriedForUpdateAssistance = hasPermission(session?.user?.role?.permissions || [], "Admisiones.update")
+
     const columnHelper = createColumnHelper<Attendance>()
     const columns : ColumnDef<Attendance,any>[] = useMemo(()=>
         [
@@ -108,7 +114,10 @@ export default function AttendanceBySubscriptionRoomPage(){
                 },
             }),
             columnHelper.accessor("observation",{
-                header : "Observación"
+                header : "Observación",
+                cell(props) {
+                    return props.getValue().length > 0 ? `${String(props.getValue()).substring(0,10)}...` : ""
+                },
             }),
             columnHelper.accessor(() => null,{
                 id : "Edit",
@@ -117,29 +126,36 @@ export default function AttendanceBySubscriptionRoomPage(){
                 enableGlobalFilter : false,
                 cell(props) {
                     return (
-                        <IconButton
-                            color="primary"
-                            onClick={()=> {
-                                setAttendanceToEdit(props.row.original)
-                                setOpenDialogEditAttendance(true)
-                        }}>
-                            <NoteAlt fontSize="small"/>
-                        </IconButton>
+                        isAuthoriedForUpdateAssistance &&
+                            <Tooltip
+                            title="Editar"
+                            placement="top"
+                        >
+                            <IconButton
+                                color="primary"
+                                onClick={()=> {
+                                    setAttendanceToEdit(props.row.original)
+                                    setOpenDialogEditAttendance(true)
+                            }}>
+                                <NoteAlt fontSize="small"/>
+                            </IconButton>
+                        </Tooltip>
+
                     )
                 },
             })
 
         ],
-        []
+        [isAuthoriedForUpdateAssistance]
     )
 
-    const pdf = useMemo(() => (
+    const pdf = (
         new jsPDF({
             format: "A4",
             unit: "mm",
             orientation: "portrait",
         })
-    ),[])
+    )
 
     const handleIsOpen = (isOpen : boolean) => {
         setOpenDialogEditAttendance(isOpen)

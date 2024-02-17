@@ -51,13 +51,13 @@ export default function AdmissionsPage(){
             },
         })
 
-    const pdf = useMemo(() => (
+    const pdf = (
         new jsPDF({
             format: "A4",
             unit: "mm",
             orientation: "portrait",
         })
-    ),[])
+    )
 
     const handleDownloadReportAssistance = () => {
 

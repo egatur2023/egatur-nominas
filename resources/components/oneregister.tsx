@@ -1,20 +1,23 @@
-import { CircularProgress, Divider, FormControl, Grid, IconButton, InputAdornment, InputLabel, MenuItem, OutlinedInput, Paper, Select, Stack, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Toolbar, Typography, useTheme } from "@mui/material";
-import { Box } from "@mui/system";
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { CircularProgress, Fade, IconButton, Stack, TextField,Tooltip } from "@mui/material";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import API from "@api";
 import { DtoResRegisterSubRoom, DtoResRegisterWithSubRooms } from "resources/types";
-import { Column, ColumnDef, createColumnHelper, FilterFn, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, RowData, SortingFn, sortingFns, useReactTable } from "@tanstack/react-table";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
-import { RankingInfo,rankItem} from '@tanstack/match-sorter-utils'
-import { Check, Close, Edit, FirstPage, KeyboardArrowLeft, KeyboardArrowRight, LastPage, PanoramaFishEye, RemoveRedEye } from "@mui/icons-material";
+import { Check, Close, Edit, ViewList , NoteAlt, Checkroom, FormatListNumbered } from "@mui/icons-material";
 import * as yup from 'yup'
 import { useRouter } from "next/router";
 import DataTable from "./data.table";
-
+import { useStoreRequest } from "resources/local/store.request";
+import DialogCreateRequest from "./request/dialog.create";
+import { useSession } from "next-auth/react"
+import { hasPermission } from "resources/functions/helpers.frontend";
 
 export default function OneRegister({register} : {register : DtoResRegisterWithSubRooms | undefined }) {
 
     const router = useRouter()
+    const { data } = useSession()
+    const { setIsOpenDialogCreate , setSubRoomId  } = useStoreRequest()
     const subRoomId = parseInt(String(router.query.subroomid)) || 0
     const qc = useQueryClient()
     const [isFocusName , setIsFocusName] = useState<boolean>(false)
@@ -45,6 +48,10 @@ export default function OneRegister({register} : {register : DtoResRegisterWithS
             setIsSubmitting(true)
         }
     }
+
+    const isAuthoriedForReadAssistance = hasPermission(data?.user?.role?.permissions || [], "Admisiones.read")
+    const isAuthoriedForCreateRequest = hasPermission(data?.user?.role?.permissions || [], "Solicitudes.create")
+    const isAuthoriedForUpdateRegister = hasPermission(data?.user?.role?.permissions || [], "Nominas.update")
 
     const columnHelper = createColumnHelper<DtoResRegisterSubRoom>()
     const columns : ColumnDef<DtoResRegisterSubRoom,any>[] = useMemo(()=>
@@ -119,22 +126,24 @@ export default function OneRegister({register} : {register : DtoResRegisterWithS
                 enableColumnFilter : false,
                 enableGlobalFilter : false,
                 cell(props) {
-                    return courseEdit && courseEdit?.subRoomId == props.row.original.subRoomId ? (
-                        <>
-                        <IconButton onClick={()=> handleSubmit()}>
-                            {
-                                isSubmitting ?(
-                                    <CircularProgress size={20} />
-                                ) : (
-                                    <Check/>
-                                )
+                    return isAuthoriedForUpdateRegister &&
+                    <>
+                    {courseEdit && courseEdit?.subRoomId == props.row.original.subRoomId ? (
+                        <Stack direction="row">
+                            <IconButton onClick={()=> handleSubmit()}>
+                                {
+                                    isSubmitting ?(
+                                        <CircularProgress size={20} />
+                                    ) : (
+                                        <Check/>
+                                    )
 
-                            }
-                        </IconButton>
-                        <IconButton onClick={()=> setCourseEdit(null)}>
-                            <Close/>
-                        </IconButton>
-                        </>
+                                }
+                            </IconButton>
+                            <IconButton onClick={()=> setCourseEdit(null)}>
+                                <Close/>
+                            </IconButton>
+                        </Stack>
                     ):
                     (
                         <IconButton
@@ -145,36 +154,75 @@ export default function OneRegister({register} : {register : DtoResRegisterWithS
                         }}>
                             <Edit fontSize="small"/>
                         </IconButton>
-                    )
+                    )}
+                    </>
                 },
             }),
             columnHelper.accessor(() => null,{
-                id : "assistance",
-                header :"Asistencia",
+                id : "actions",
+                header :"Acciones",
                 enableColumnFilter : false,
                 enableGlobalFilter : false,
                 cell(props) {
                     return (
-                        <IconButton
-                            size="small"
-                            color="primary"
-                            onClick={()=> {
-                                router.push(`/app/admin/register/${register?.id}/attendance/${props.row.original.subRoomId}`)
-                        }}>
-                            <RemoveRedEye fontSize="small"/>
-                        </IconButton>
+                        <>
+                        {
+                            isAuthoriedForReadAssistance &&
+                            <Tooltip
+                                title="Asistencias"
+                                placement="top"
+                                TransitionComponent={Fade}
+                                TransitionProps={{ timeout: 400 }}
+                                arrow
+                            >
+
+                                <IconButton
+                                    size="small"
+                                    color="primary"
+                                    onClick={()=> {
+                                        router.push(`/app/admin/register/${register?.id}/attendance/${props.row.original.subRoomId}`)
+                                    }}>
+                                    <FormatListNumbered fontSize="small"/>
+                                </IconButton>
+                            </Tooltip>
+                        }
+                        {
+                            isAuthoriedForCreateRequest &&
+                            <Tooltip
+                                title="Solicitud de nota"
+                                placement="top"
+                                TransitionComponent={Fade}
+                                TransitionProps={{ timeout: 400 }}
+                                arrow
+                            >
+                                <IconButton
+                                    onClick={()=> {
+                                        setSubRoomId(props.row.original.subRoomId)
+                                        setIsOpenDialogCreate(true)
+                                    }}>
+                                    <NoteAlt fontSize="small"/>
+                                </IconButton>
+                            </Tooltip>
+                        }
+
+                        </>
                     )
                 },
-            })
+            }),
+
         ],
-        [courseEdit , isSubmitting]
+        [courseEdit , isSubmitting,isAuthoriedForReadAssistance ,isAuthoriedForCreateRequest , isAuthoriedForUpdateRegister]
     )
 
     return (
+
+    <>
+        <DialogCreateRequest userId={data?.user?.id || 0} />
         <DataTable
             //@ts-ignore
             columns={columns}
             data={register?.subRooms || []}
-        />
+            />
+    </>
     )
 }

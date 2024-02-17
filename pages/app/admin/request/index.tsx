@@ -1,19 +1,24 @@
 import API from "@api";
-import { ContentPasteGo, FactCheck } from "@mui/icons-material";
-import { Chip, IconButton } from "@mui/material";
+import { ContentPasteGo, Edit, FactCheck } from "@mui/icons-material";
+import { Chip, IconButton, Tooltip } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
 import DataTable from "resources/components/data.table";
 import DialogEditRequestAdmin from "resources/components/request/dialog.edit.admin";
+import DialogEditRequestSuper from "resources/components/request/dialog.edit.super";
+import { hasPermission } from "resources/functions/helpers.frontend";
 import { useStoreRequest } from "resources/local/store.request";
 import { DtoResRequestsForAdmin } from "resources/types";
 
 export default function RequestIndex(){
 
     const router = useRouter()
-    const { data : requests ,isFetching } = useQuery<DtoResRequestsForAdmin[]>(
+    const { data } = useSession()
+    const { setIsOpenDialogEditForSuper , setRequestToEditForSuper } = useStoreRequest()
+    const { data : requests } = useQuery<DtoResRequestsForAdmin[]>(
         ["api/request/admin"],
         async () => await API.getRequestForAdmin(),{
             initialData : []
@@ -30,6 +35,9 @@ export default function RequestIndex(){
             RECHAZADO : "error",
         }
     ),[])
+
+    const isAuthorzedForCreateRequest = hasPermission(data?.user?.role.permissions ||[],'Solicitudes.create')
+    const isAuthorzedForUpdateRequest = hasPermission(data?.user?.role.permissions ||[],'Solicitudes.update')
     const columnHelper = createColumnHelper<DtoResRequestsForAdmin>()
     const columns : ColumnDef<DtoResRequestsForAdmin,any>[] = useMemo(()=>
         [
@@ -68,38 +76,54 @@ export default function RequestIndex(){
                 cell(props) {
                     return (
                         <>
-                            <IconButton onClick={ () => {
-                                setRequestToEdit(props.row.original)
-                                setIsOpenDialogEdit(true)
-                            } }>
-                                <FactCheck fontSize="small"/>
-                            </IconButton>
-                            <IconButton onClick={ () => {
-                                router.push({
-                                    pathname : `/app/admin/register/${props.row.original.registerId}`,
-                                    query : {
-                                        subroomid : props.row.original.subRoomId
-                                    }
-                                })
-                            } }>
-                                <ContentPasteGo fontSize="small"/>
-                            </IconButton>
+                           {
+                            isAuthorzedForUpdateRequest &&
+                            <Tooltip title="Responder" arrow placement="top">
+                                <IconButton onClick={ () => {
+                                    setRequestToEdit(props.row.original)
+                                    setIsOpenDialogEdit(true)
+                                } }>
+                                    <FactCheck fontSize="small"/>
+                                </IconButton>
+                            </Tooltip>
+                            }
+                            {
+                                isAuthorzedForCreateRequest &&
+                                <Tooltip title="Editar" arrow placement="top">
+                                    <IconButton onClick={ () => {
+                                        setRequestToEditForSuper(props.row.original)
+                                        setIsOpenDialogEditForSuper(true)
+                                    } }>
+                                        <Edit fontSize="small"/>
+                                    </IconButton>
+                                </Tooltip>
+                            }
+                            <Tooltip title="Ir a la nota" arrow placement="top">
+                                <IconButton onClick={ () => {
+                                    router.push({
+                                        pathname : `/app/admin/register/${props.row.original.registerId}`,
+                                        query : {
+                                            subroomid : props.row.original.subRoomId
+                                        }
+                                    })
+                                } }>
+                                    <ContentPasteGo fontSize="small"/>
+                                </IconButton>
+                            </Tooltip>
                         </>
                     )
                 },
             }),
 
         ],
-        []
+        [isAuthorzedForUpdateRequest]
     )
 
-    if(isFetching){
-        return <>Cargando...</>
-    }
 
     return (
         <>
             <DialogEditRequestAdmin/>
+            <DialogEditRequestSuper/>
             <DataTable
                 //@ts-ignore
                 columns={columns}

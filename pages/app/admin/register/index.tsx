@@ -1,6 +1,6 @@
 import API from "@api";
-import { AssignmentInd, DriveFileRenameOutline, Print, RemoveRedEye, Topic } from "@mui/icons-material";
-import { Button, CircularProgress, Fade, IconButton, Tooltip, Typography } from "@mui/material";
+import { AssignmentInd, AssignmentTurnedIn, CloudDownload, DriveFileRenameOutline, NoteAlt, Print, RemoveRedEye, Topic, Visibility } from "@mui/icons-material";
+import { Button, CircularProgress, Fade, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
 import { useQuery } from '@tanstack/react-query';
@@ -105,11 +105,11 @@ export default function Register() {
     }
 
     const handleActionDetailRegister = (registerId: any) => {
-        console.log(registerId)
+        // console.log(registerId)
         router.push(`/app/admin/register/${registerId}`)
     }
     const handleActionEnrollment = (registerId: any) => {
-        console.log(registerId)
+        // console.log(registerId)
         router.push(`/app/admin/register/enrollment/${registerId}`)
     }
 
@@ -117,13 +117,21 @@ export default function Register() {
         setRegisterId(register.id)
     }
 
+    const handleGotToRegisterById = (registerId : number) => {
+        router.push(`/app/admin/register/${registerId}`)
+    }
+
     const { data: registers, isLoading } = useQuery<DtoResRegister[]>(["registers"], async () => API.getRegisters(),{
         initialData : []
     })
 
+    const isAuthorizedForReadEnrollment = hasPermission(data?.user.role.permissions||[],'Matrícula.read') != null
+    const isAuthorizedForReadRegister = hasPermission(data?.user.role.permissions||[],'Nominas.read') != null
+    const isAuthorizedForUpdateRegister = hasPermission(data?.user.role.permissions||[],'Nominas.update') != null
+
     const columnHelper = createColumnHelper<DtoResRegister>()
-    //@ts-ignore
-    const columns : ColumnDef<DtoResRegister>[] = useMemo(()=> [
+
+    const columns : ColumnDef<DtoResRegister,any>[] = useMemo(()=> [
         columnHelper.accessor((_,index)=> ++index,{
             header : "N°"
         }),
@@ -145,40 +153,41 @@ export default function Register() {
                 return DateTime.fromISO(props.getValue()).toUTC().toISODate()
             },
         }),
-        // columnHelper.accessor("dateEnd",{
-        //     header : "Fecha Término",
-        //     cell(props) {
-        //         return props.getValue() != "" ? DateTime.fromISO(props.getValue()).toUTC().toISODate() : props.getValue()
-        //     },
-        // }),
-        columnHelper.accessor(()=> 0,{
+        columnHelper.accessor(() => null,{
             id : "Actions",
             header : "Acciones",
             enableGlobalFilter : false,
             cell(props) {
-                return (
-                    <Box>
-                        <Tooltip
-                            title="Asignar Curso"
-                            placement="top"
-                            TransitionComponent={Fade}
-                            TransitionProps={{ timeout: 400 }}
-                            arrow>
-                            <IconButton sx={{ ml: 2 }} size="large" onClick={() => handleActionEnrollment(props.row.original.id)}>
-                                <Topic fontSize="small" />
-                            </IconButton>
-                        </Tooltip>
 
-                        <Tooltip
-                            title="Editar de Malla"
-                            placement="top"
-                            TransitionComponent={Fade}
-                            TransitionProps={{ timeout: 400 }}
-                            arrow>
-                            <IconButton size="large" onClick={() => handleActionDetailRegister(props.row.original.id)}>
-                                <DriveFileRenameOutline fontSize="small" />
-                            </IconButton>
-                        </Tooltip>
+                return (
+                    <Stack direction="row">
+
+                        {
+                            isAuthorizedForReadEnrollment &&
+                            <Tooltip
+                                title="Asignar Curso"
+                                placement="top"
+                                TransitionComponent={Fade}
+                                TransitionProps={{ timeout: 400 }}
+                                arrow>
+                                <IconButton sx={{ ml: 2 }} size="large" onClick={() => handleActionEnrollment(props.row.original.id)}>
+                                    <Topic fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                        }
+                        {
+                            isAuthorizedForReadRegister &&
+                            <Tooltip
+                                title="Ver de malla"
+                                placement="top"
+                                TransitionComponent={Fade}
+                                TransitionProps={{ timeout: 400 }}
+                                arrow>
+                                <IconButton size="large" onClick={() => handleActionDetailRegister(props.row.original.id)}>
+                                    <RemoveRedEye fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                         }
                         <Tooltip
                             title="Descargar PDF"
                             placement="top"
@@ -186,38 +195,43 @@ export default function Register() {
                             TransitionProps={{ timeout: 400 }}
                             arrow>
                             <IconButton size="large" onClick={() => downloadPDF(props.row.original) }>
-                                <Print fontSize="small" />
+                                <CloudDownload fontSize="small" />
                             </IconButton>
                         </Tooltip>
-                        <Tooltip
-                            title="Observación"
-                            placement="top"
-                            TransitionComponent={Fade}
-                            TransitionProps={{ timeout: 400 }}
-                            arrow>
-                            <IconButton size="large" onClick={() => handleEditObservation(props.row.original) }>
-                                <RemoveRedEye fontSize="small" />
-                            </IconButton>
-                        </Tooltip>
-                    </Box>
+                        {
+                            isAuthorizedForUpdateRegister &&
+                            <Tooltip
+                                title="Editar observación"
+                                placement="top"
+                                TransitionComponent={Fade}
+                                TransitionProps={{ timeout: 400 }}
+                                arrow>
+                                <IconButton size="large" onClick={() => handleEditObservation(props.row.original) }>
+                                    <AssignmentTurnedIn fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                        }
+
+
+                    </Stack>
                 )
             },
         }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    ],[])
+    ],[isAuthorizedForReadEnrollment])
 
     const isAuthorizedForCreate = hasPermission(data?.user.role.permissions||[],'Nominas.create') != null
 
-    if (isLoading) {
-        return <Box
-            display={"flex"}
-            justifyContent={"center"}
-            alignItems={"center"}
-            height={"100vh"}
-        >
-            <CircularProgress></CircularProgress>
-        </Box>
-    }
+    // if (isLoading) {
+    //     return <Box
+    //         display={"flex"}
+    //         justifyContent={"center"}
+    //         alignItems={"center"}
+    //         height={"100vh"}
+    //     >
+    //         <CircularProgress></CircularProgress>
+    //     </Box>
+    // }
 
     return (
         <>

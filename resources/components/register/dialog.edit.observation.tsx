@@ -27,8 +27,6 @@ export default function DialogEditObservationRegister(){
         enableReinitialize : registerEditObservation != null
     })
 
-    console.log({values})
-
     const mutation = useMutation(
         API.putObservationRegister,
         {

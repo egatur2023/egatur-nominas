@@ -437,4 +437,5 @@ type MODULE_VALUES = 'Módulos.create'|'Módulos.read' | 'Módulos.update'| 'Mó
 'Docentes.create'|'Docentes.read' | 'Docentes.update'| 'Docentes.delete'|
 'Admisiones.create'| 'Admisiones.read' | 'Admisiones.update' |'Admisiones.delete'|
 'Roles.create' | 'Roles.read'| 'Roles.update' | 'Roles.delete'|
-'Reporte General.create'| 'Reporte General.read'| 'Reporte General.update'|  'Reporte General.delete';
+'Reporte General.create'| 'Reporte General.read'| 'Reporte General.update'|  'Reporte General.delete'|
+'Matrícula.create'| 'Matrícula.read'| 'Matrícula.update'|  'Matrícula.delete';

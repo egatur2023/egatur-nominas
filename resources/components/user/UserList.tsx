@@ -8,10 +8,13 @@ import { ResultGetUsers } from "resources/types";
 import { Chip, IconButton } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import { useStoreUser } from "resources/local/store.user";
+import { hasPermission } from "resources/functions/helpers.frontend";
+import { useSession } from "next-auth/react";
 
 export function UserList(){
 
     const { setIsOpenEdit , setUserToEdit } = useStoreUser()
+    const { data } = useSession()
     const { data : users } = useQuery<ResultGetUsers>(
         {
             queryKey : ["api/users"],
@@ -19,6 +22,7 @@ export function UserList(){
             initialData : [],
         }
     )
+    const isAuthorizedForUpdateUser = hasPermission(data?.user?.role.permissions || [],'Usuarios.update')
 
     const handleEdit = (user : (User & { role : Role})) => {
         setUserToEdit(user)
@@ -48,9 +52,12 @@ export function UserList(){
             header : "Rol",
             cell(props) {
                 return (<>
-                    <IconButton size="small" color="primary" onClick={() => handleEdit(props.row.original)}>
-                        <Edit fontSize="small"/>
-                    </IconButton>
+                    {
+                        isAuthorizedForUpdateUser &&
+                        <IconButton size="small" color="primary" onClick={() => handleEdit(props.row.original)}>
+                            <Edit fontSize="small"/>
+                        </IconButton>
+                    }
                 </>)
             },
         }),

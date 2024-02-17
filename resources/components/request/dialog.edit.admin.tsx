@@ -89,7 +89,7 @@ export default function DialogEditRequestAdmin(){
             setIsOpenDialogEdit(isOpen)
         }}>
             <DialogTitle>
-                <Typography>Actualizar solicitud</Typography>
+                <Typography>Responder solicitud</Typography>
             </DialogTitle>
             <DialogContent dividers={true}>
                     <Stack spacing={2}>
