@@ -1,28 +1,31 @@
 import { create } from "zustand";
 
-type AdmissionListFilterStore = {
-    careerId : number
-    curricularId : number
-    admision : string
-    dateStart : string
-    dateEnd : string
 
+type AdmissionListFilterStore = {
+    careerName : string
+    curricularId : number
+    // careerId: number
+    admission : string
+    month : string
+    year : string
+    schedule : string
     isLoading : boolean
-    setParam: (param : string, value  : any) => void
+    setFilterAdmission: (filter : "careerName"|"month"|"year"|"schedule"|"curricularId" , value : string) => void
     setLoading: (isLoading : boolean) => void
 }
 export const useStoreAdmissionListFilter = create<AdmissionListFilterStore>((set ,get) => ({
-    careerId :0,
+    careerName :"",
     curricularId :0,
-    admision : "",
-    dateStart : "2023-01-01" ,
-    dateEnd : "2023-01-01" ,
-
+    admission : "",
+    month : "" ,
+    year : "" ,
+    schedule : "" ,
+    // careerId : 0 ,
     isLoading : false,
-    setParam : (param, value) => {
+    setFilterAdmission : (filter : string, value : string) => {
         set((state) => ({
             ...state,
-            [param]: value,
+            [filter] : value
         }))
     },
     setLoading(isLoading : boolean) {

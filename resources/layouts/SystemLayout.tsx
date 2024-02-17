@@ -2,9 +2,10 @@ import { MouseEvent , KeyboardEvent } from 'react';
 import { Container,Drawer,Box,List,ListSubheader } from '@mui/material'
 import AccordionSidebar from '../components/sidebar/accordion';
 import TopAppBar from 'resources/components/top.appbar';
-import { itemsSidebarAdmin , itemsSidebarSupervisor } from 'resources/routes';
+import { itemsSidebarAdmin  } from 'resources/routes';
 import { useSession } from 'next-auth/react';
 import { AreaSidebar, useStoreSidebar } from 'resources/local/store.sidebar';
+import { Session } from 'next-auth';
 
 const SystemLayout = (props : any) => {
 
@@ -20,6 +21,20 @@ const SystemLayout = (props : any) => {
       }
 
       setToggleSidebar(open)
+    }
+
+    const getItemsSidebardByRole = (data : Session|null) => {
+        if(data?.user != undefined &&  data.user.role != undefined){
+            // if(data.user.role.name == "ADMIN") {
+                return itemsSidebarAdmin
+            // }else if(data.user.role.name == "SUPERVISOR"){
+            //     return itemsSidebarSupervisor
+            // }else{
+            //     return itemsSidebarAdvisor
+            // }
+        }
+        return []
+
     }
 
     const ListMenu = ({itemsSidebar} : {itemsSidebar : AreaSidebar[]}) => (
@@ -61,8 +76,7 @@ const SystemLayout = (props : any) => {
               onClose={toggleDrawer(false)}>
 
             <ListMenu
-                //@ts-ignore
-                itemsSidebar={ ( String(data?.user?.email?.includes("@egatur.edu.pe")) ) ? itemsSidebarAdmin : itemsSidebarSupervisor }
+                itemsSidebar={getItemsSidebardByRole(data)}
             />
             </Drawer>
           <main>

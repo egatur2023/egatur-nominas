@@ -1,4 +1,4 @@
-import { Room, StateUpdate } from "@prisma/client"
+import { Room, StateUpdate, TypeUser } from "@prisma/client"
 import { Prisma } from "prisma/prisma-client"
 import getCoursesByModuleId from "./services/course"
 import { getRequestForAdmin } from "./services/request"
@@ -6,8 +6,13 @@ import getRoomsByCourseId from "./services/room"
 import { getAttendancesBySubscriptionRoomId } from "./services/attendance/getAttendancesBySubscriptionRoomId"
 import { getCourseBySubModuleIdAndName } from "./services/course/getCourseBySubModuleIdAndName"
 import { getSubscriptionRoomById } from "./services/subroom/getSubscriptionRoomById"
-import { getRoomsByCareer } from "./services/subroom/getRoomsByCareer"
-import { getSubscriptionsRoomByRoomId } from "./services/subroom/getSubscriptionsRoomByRoomId"
+import { getAdmissionsByAdmission } from "./services/subroom/getRoomsByCareer"
+import { executeQueryGetSubsRoomByAdmission, getSubscriptionsRoomByAdmission } from "./services/subroom/getSubscriptionsRoomByRoomId"
+import { getRoles } from "./services/role/list"
+import { getUsers } from "./services/user/list"
+import { getSubscriptionsRoomReportByAdmission } from "./services/attendance/getSubscriptionsRoomReportByAdmission"
+import loginUseCase from "./services/login.use.case"
+
 
 export type DtoCreateRequest = {
     reason : string
@@ -248,10 +253,11 @@ export type DtoFilterReport = {
     dateEnd : string
 }
 export type DtoFilterAdmissions = {
-    careerId : number
-    admision : string
-    dateStart : string
-    dateEnd : string
+    // careerId : number
+    careerName : string
+    year : string
+    month : string
+    schedule : string
 }
 
 export type DtoFilterAttendance = {
@@ -365,14 +371,38 @@ export type DtoResRequestsForSuper = {
     subRoomId : number
 }
 
+export type DtoCreateModuleSystem = {
+    name : string
+}
+
+export type DtoCreateRole = {
+    name : TypeUser
+}
+
 export type ResponseAttendancesBySubRoomId = {
-    studentFullname: string;
-    dateAdmision: string;
-    schedule: string;
-    attendances: Attendance[];
+    courseName: string
+    teacherFullName: string
+    studentFullname: string
+    dateAdmision: string
+    schedule: string
+    attendances: Attendance[]
 }
 
 // EXTENDED TYPES PRISMA
+
+export type ResultRole = {
+    permissions: {
+        id: number;
+        roleId: number;
+        moduleId: number;
+        action: $Enums.ActionPermission;
+    }[];
+} & {
+    id: number;
+    name: $Enums.TypeUser;
+}
+
+type UserWithRole = User & { role : Role }
 
 export type RegisterWithRelations1 = Prisma.PromiseReturnType<typeof getRegisterWithRelations1>
 export type RoomsByCourseId1 = Prisma.PromiseReturnType<typeof getRoomsByCourseId>
@@ -381,8 +411,14 @@ export type RequestsForAdmin = Prisma.PromiseReturnType<typeof getRequestForAdmi
 export type ResultGetAttendancesBySubscriptionRoomId = Prisma.PromiseReturnType<typeof getAttendancesBySubscriptionRoomId>
 export type ResultGetCourseBySubModuleIdAndName = Prisma.PromiseReturnType<typeof getCourseBySubModuleIdAndName>
 export type ResultGetSubscriptionRoomById = Prisma.PromiseReturnType<typeof getSubscriptionRoomById>
-export type ResultGetRoomsByCareer = Prisma.PromiseReturnType<typeof getRoomsByCareer>
-export type ResultGetSubscriptionsRoomByRoomId = Prisma.PromiseReturnType<typeof getSubscriptionsRoomByRoomId>
+export type ResultGetAdmissionsByAdmission = Prisma.PromiseReturnType<typeof getAdmissionsByAdmission>
+export type ResultGetSubscriptionsRoomByAdmission = Prisma.PromiseReturnType<typeof getSubscriptionsRoomByAdmission>
+export type ResultGetRoles = Prisma.PromiseReturnType<typeof getRoles>
+export type ResultGetUsers = Prisma.PromiseReturnType<typeof getUsers>
+export type TypeResultSubs = Prisma.PromiseReturnType<typeof executeQueryGetSubsRoomByAdmission>
+export type ResultSubsRoomReportByAdmission = Prisma.PromiseReturnType<typeof getSubscriptionsRoomReportByAdmission>
+export type GroupedResult = Record<string,{studentFullName : string , courses : TypeResultSubs }>
+export type ResultLoginUseCase = Prisma.PromiseReturnType<typeof loginUseCase>
 
 //const type
 
@@ -391,3 +427,14 @@ type WeekDays = {
     position : number
     abbrevation : string
 }
+
+
+type MODULE_VALUES = 'Módulos.create'|'Módulos.read' | 'Módulos.update'| 'Módulos.delete'|
+'Usuarios.create'|'Usuarios.read' |'Usuarios.update' | 'Usuarios.delete'|
+'Solicitudes.create'| 'Solicitudes.read'| 'Solicitudes.update' | 'Solicitudes.delete'|
+'Malla Curricular.create'|'Malla Curricular.read' |'Malla Curricular.update'|'Malla Curricular.delete'|
+'Nominas.create'| 'Nominas.read'| 'Nominas.update'| 'Nominas.delete'|
+'Docentes.create'|'Docentes.read' | 'Docentes.update'| 'Docentes.delete'|
+'Admisiones.create'| 'Admisiones.read' | 'Admisiones.update' |'Admisiones.delete'|
+'Roles.create' | 'Roles.read'| 'Roles.update' | 'Roles.delete'|
+'Reporte General.create'| 'Reporte General.read'| 'Reporte General.update'|  'Reporte General.delete';

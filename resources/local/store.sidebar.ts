@@ -1,9 +1,12 @@
+import { MODULES } from 'resources/constants'
+import { MODULE_VALUES } from 'resources/types'
 import {create} from 'zustand'
 
 export type PageSidebar = {
     title : string
     name : string
     path : string
+    permissions : MODULE_VALUES
 }
 
 export type GroupPageSidebar = {

@@ -1,6 +1,7 @@
 import axios from 'axios';
-import { DtoCreateCareer, DtoCreateCourse, DtoCreateCurricular, DtoCreateModule, DtoCreateRegister, DtoCreateRoom, DtoCreateStudent, DtoCreateSubModuleWithRooms, DtoEditCareer, DtoEditCourse, DtoEditCourseName, DtoEditCurricular, DtoEditModule, DtoEditRoom, DtoEditSubRoomNameAndScore, DtoEditSubRoom, DtoFilterReport, DtoEditRegister, DtoCreateTeacher, DtoCreateRequest, DtoEditRequestAdmin, DtoEditTeacher, DtoUpdateAttendance, DtoFilterAdmissions, DtoUpdateRegister } from './types';
+import { DtoCreateCareer, DtoCreateCourse, DtoCreateCurricular, DtoCreateModule, DtoCreateRegister, DtoCreateRoom, DtoCreateStudent, DtoCreateSubModuleWithRooms, DtoEditCareer, DtoEditCourse, DtoEditCourseName, DtoEditCurricular, DtoEditModule, DtoEditRoom, DtoEditSubRoomNameAndScore, DtoEditSubRoom, DtoFilterReport, DtoEditRegister, DtoCreateTeacher, DtoCreateRequest, DtoEditRequestAdmin, DtoEditTeacher, DtoUpdateAttendance, DtoFilterAdmissions, DtoUpdateRegister, DtoCreateModuleSystem, DtoCreateRole, ResponseAttendancesBySubRoomId } from './types';
 import { saveAs } from 'file-saver';
+import { Permission, User } from '@prisma/client';
 
 export const instanceAxios = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API,
@@ -142,9 +143,9 @@ export default abstract class API {
         }
     }
 
-    static async fetchAdmissionsByRoomId(roomId: number) {
+    static async fetchRoles() {
         try {
-            const res = await instanceAxios.get(`/admission/${roomId}`);
+            const res = await instanceAxios.get(`/role/list`)
             return res.data;
 
         } catch (error: any) {
@@ -152,13 +153,44 @@ export default abstract class API {
         }
     }
 
-    static async fetchGetAttendancesBySubRoomId(registerId : number ,subRoomId: number) {
+    static async fetchUsers() {
         try {
-            const res = await instanceAxios.get(`/register/${registerId}/attendance/${subRoomId}`);
+            const res = await instanceAxios.get(`/user/list`)
             return res.data;
 
         } catch (error: any) {
             console.log(error)
+        }
+    }
+
+    static async fetchModulesSystem() {
+        try {
+            const res = await instanceAxios.get(`/ms/list`)
+            return res.data;
+
+        } catch (error: any) {
+            console.log(error)
+        }
+    }
+
+    static async fetchAdmissionsByAdmission(admission: string) {
+        try {
+            const res = await instanceAxios.get(`/admission/${admission}`);
+            return res.data;
+
+        } catch (error: any) {
+            console.log(error)
+        }
+    }
+
+    static async fetchGetAttendancesBySubRoomId(registerId : number ,subRoomId: number) : Promise<ResponseAttendancesBySubRoomId> {
+        try {
+            const res = await instanceAxios.get(`/register/${registerId}/attendance/${subRoomId}`);
+            return res.data as ResponseAttendancesBySubRoomId
+
+        } catch (error: any) {
+            console.log(error)
+            return {} as ResponseAttendancesBySubRoomId
         }
     }
     static async postFilterAdmissions(filters : DtoFilterAdmissions) {
@@ -175,6 +207,25 @@ export default abstract class API {
     static async postReport(params: DtoFilterReport) {
         try {
             const res = await instanceAxios.post(`/report`, params)
+            return res.data;
+
+        } catch (error: any) {
+            console.log(error)
+        }
+    }
+
+    static async postModuleSystem( values : DtoCreateModuleSystem) {
+        try {
+            const res = await instanceAxios.post(`/ms/store`, values)
+            return res.data;
+
+        } catch (error: any) {
+            console.log(error)
+        }
+    }
+    static async postRole( values : DtoCreateRole) {
+        try {
+            const res = await instanceAxios.post(`/role/store`, values)
             return res.data;
 
         } catch (error: any) {
@@ -240,6 +291,23 @@ export default abstract class API {
         }
     }
 
+    static async putPermission(permission  : Permission) {
+        try {
+            const res = await instanceAxios.post('/permission/update', permission)
+            return res.data
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    static async putUser(user  : User) {
+        try {
+            const res = await instanceAxios.post('/user/update', user)
+            return res.data
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
     static async putRoom(room: DtoEditRoom) {
         try {

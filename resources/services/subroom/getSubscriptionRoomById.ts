@@ -7,7 +7,11 @@ export const getSubscriptionRoomById = async (id: number) => {
             id
         },
         include: {
-            room : true
+            room : {
+                include : {
+                    teacher : true
+                }
+            }
         }
     })
 }

@@ -27,17 +27,16 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed
 }
 
-export type PropsDataTable<T,V> = {
+export type PropsDataTable<T> = {
     data : T[],
-    columns : ColumnDef<V,any>
+    columns : ColumnDef<T,any>[]
 }
 
-export default function DataTable<T,V>({ data , columns } : PropsDataTable<T,V> ){
+export default function DataTable<T,V>({ data , columns } : PropsDataTable<T> ){
 
     const [globalFilter , setGlobalFilter] = useState<string>("")
     const table = useReactTable({
         data : data,
-        //@ts-ignore
         columns,
         getCoreRowModel : getCoreRowModel(),
         enableColumnFilters : true,
@@ -49,6 +48,9 @@ export default function DataTable<T,V>({ data , columns } : PropsDataTable<T,V> 
         getFilteredRowModel: getFilteredRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
+        filterFns : {
+            fuzzy : fuzzyFilter
+        }
     })
 
     return (

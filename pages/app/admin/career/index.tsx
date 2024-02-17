@@ -3,6 +3,7 @@ import { Add, AddLocationAlt, CompareArrows, Home, Inventory, QrCode2 } from "@m
 import { Box, Button, Card, CardContent, Container, Divider, TableHead, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Stack, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Typography, Avatar, Breadcrumbs, Link } from "@mui/material";
 import { dehydrate, QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
 import { GetServerSidePropsContext } from "next";
+import { useSession } from "next-auth/react";
 // import { unstable_getServerSession } from "next-auth";
 import { useState } from "react";
 import CreateCareer from "resources/components/career/create";
@@ -14,11 +15,13 @@ import ListCurricularStructure from "resources/components/curricular/list";
 import DialogBasic from "resources/components/dialog.basic";
 import CreateModule from "resources/components/module/create";
 import ListModule from "resources/components/module/list";
+import { hasPermission } from "resources/functions/helpers.frontend";
 import { useStoreCurricular } from "resources/local/store.curricular";
 // import queryClient from "resources/query.client";
 // import { authOptions } from "../../api/auth/[...nextauth]"
 
 export default function Career(props : any) {
+    const { data } = useSession()
     const [isOpenCreateCareer, setIsOpenCreateCareer] = useState<boolean>(false)
     const [isOpenCreateCurricular, setIsOpenCreateCurricular] = useState<boolean>(false)
     const [isOpenCreateModule, setIsOpenModule] = useState<boolean>(false)
@@ -40,23 +43,29 @@ export default function Career(props : any) {
         setIsOpenCreateCourse(isOpen)
     }
 
+    const isAuthorized = hasPermission(data?.user.role.permissions||[],'Malla Curricular.create') != null
+
     return <Box sx={{ marginTop: 4 }}
         mx={"2rem"}
     >
-        {/* MODALS */}
-        <DialogBasic isOpen={isOpenCreateCareer} handleOpenDialog={handleIsOpenCreateCareer}>
-            <CreateCareer fnOnCreate={handleIsOpenCreateCareer}/>
-        </DialogBasic>
-        <DialogBasic isOpen={isOpenCreateCurricular} handleOpenDialog={handleOpenCreateCurricular}>
-            <CreateCurricular fnOnCreate={handleOpenCreateCurricular}/>
-        </DialogBasic>
-        <DialogBasic isOpen={isOpenCreateModule} handleOpenDialog={handleIsOpenCreateModule}>
-            <CreateModule fnOnCreate={handleIsOpenCreateModule}/>
-        </DialogBasic>
-        <DialogBasic isOpen={isOpenCreateCourse} handleOpenDialog={handleIsOpenCreateCourse}>
-            <CreateCourse fnOnCreate={handleIsOpenCreateCourse}/>
-        </DialogBasic>
-        {/* END MODALS */}
+        {
+            isAuthorized &&
+            <DialogBasic isOpen={isOpenCreateCareer} handleOpenDialog={handleIsOpenCreateCareer}>
+                <CreateCareer fnOnCreate={handleIsOpenCreateCareer}/>
+            </DialogBasic>
+            &&
+            <DialogBasic isOpen={isOpenCreateCurricular} handleOpenDialog={handleOpenCreateCurricular}>
+                <CreateCurricular fnOnCreate={handleOpenCreateCurricular}/>
+            </DialogBasic>
+            &&
+            <DialogBasic isOpen={isOpenCreateModule} handleOpenDialog={handleIsOpenCreateModule}>
+                <CreateModule fnOnCreate={handleIsOpenCreateModule}/>
+            </DialogBasic>
+            &&
+            <DialogBasic isOpen={isOpenCreateCourse} handleOpenDialog={handleIsOpenCreateCourse}>
+                <CreateCourse fnOnCreate={handleIsOpenCreateCourse}/>
+            </DialogBasic>
+        }
         <Typography variant="h5" sx={{ fontWeight: "bolder", marginBottom: theme => theme.spacing(2) }}>Gestión</Typography>
         <Card variant="outlined">
             <CardContent sx={{ padding: "0px !important" }}>
@@ -95,16 +104,18 @@ export default function Career(props : any) {
                             <Typography variant="body2">Carreras</Typography>
                         </Box>
                         <Divider/>
-                        <Button
-                        variant="text"
-                        fullWidth
-                        onClick={() => handleIsOpenCreateCareer(true)}
-                        sx={{ display : "flex" , justifyContent : "flex-start", textTransform : "capitalize"  , paddingY:t=>t.spacing(1) }}
-                        >
-                            <Add sx={{ marginRight : t => t.spacing(1) }}/>
-                            <Typography variant="body2" >Crear Carrera</Typography>
-                        </Button>
-                        <Divider />
+                        {
+                            isAuthorized &&
+                            <Button
+                                variant="text"
+                                fullWidth
+                                onClick={() => handleIsOpenCreateCareer(true)}
+                                sx={{ display : "flex" , justifyContent : "flex-start", textTransform : "capitalize"  , paddingY:t=>t.spacing(1) }}
+                            >
+                                <Add sx={{ marginRight : t => t.spacing(1) }}/>
+                                <Typography variant="body2" >Crear Carrera</Typography>
+                            </Button>
+                        }
                         <ListCareer />
                     </Grid>
                     {/* COLUMN MALLA 2 */}
@@ -114,20 +125,23 @@ export default function Career(props : any) {
                             <Typography variant="body2">Mallas Curriculares</Typography>
                         </Box>
                         <Divider />
-                        {<>
-                            <Button
-                                variant="text"
-                                fullWidth
-                                disabled={selectedCareer ? false : true}
-                                onClick={() => handleOpenCreateCurricular(true)}
-                                sx={{ display: "flex", justifyContent: "flex-start", textTransform: "capitalize", py : 1 }}
-                            >
-                                <Add sx={{ mr : 1 }} />
-                                <Typography variant="body2">Crear malla curricular</Typography>
-                            </Button>
+                        <>
+                            {
+                                isAuthorized &&
+                                <Button
+                                    variant="text"
+                                    fullWidth
+                                    disabled={selectedCareer ? false : true}
+                                    onClick={() => handleOpenCreateCurricular(true)}
+                                    sx={{ display: "flex", justifyContent: "flex-start", textTransform: "capitalize", py : 1 }}
+                                >
+                                    <Add sx={{ mr : 1 }} />
+                                    <Typography variant="body2">Crear malla curricular</Typography>
+                                </Button>
+                            }
                             <Divider />
                             <ListCurricularStructure />
-                        </>}
+                        </>
                     </Grid>
                     {/* COLUMN MODULO 3 */}
                     <Grid item xs={12} md={2} lg={2} sx={{ borderLeft: "1px solid", borderColor: t => t.palette.divider }}>
@@ -136,16 +150,19 @@ export default function Career(props : any) {
                             <Typography variant="body2">Modulos</Typography>
                         </Box>
                         <Divider />
-                        <Button
-                            variant="text"
-                            fullWidth
-                            disabled={selectedCurricular ? false : true}
-                            onClick={() => handleIsOpenCreateModule(true)}
-                            sx={{ display: "flex", justifyContent: "flex-start", textTransform: "capitalize", py : 1 }}
-                        >
-                            <Add sx={{ mr : 1 }} />
-                            <Typography variant="body2">Crear Modulo</Typography>
-                        </Button>
+                        {
+                            isAuthorized &&
+                            <Button
+                                variant="text"
+                                fullWidth
+                                disabled={selectedCurricular ? false : true}
+                                onClick={() => handleIsOpenCreateModule(true)}
+                                sx={{ display: "flex", justifyContent: "flex-start", textTransform: "capitalize", py : 1 }}
+                            >
+                                <Add sx={{ mr : 1 }} />
+                                <Typography variant="body2">Crear Modulo</Typography>
+                            </Button>
+                        }
                         <Divider />
                         <ListModule />
                     </Grid>
@@ -157,20 +174,25 @@ export default function Career(props : any) {
                             <Typography variant="body2">Cursos</Typography>
                         </Box>
                         <Divider />
-                        {<>
-                            <Button
-                                variant="text"
-                                fullWidth
-                                disabled={selectedModule ? false : true}
-                                onClick={() => handleIsOpenCreateCourse(true)}
-                                sx={{ display: "flex", justifyContent: "flex-start", textTransform: "capitalize", py : 1 }}
-                            >
-                                <Add sx={{ mr : 1 }} />
-                                <Typography variant="body2">Crear Curso</Typography>
-                            </Button>
+
+                        <>
+                            {
+                                isAuthorized &&
+                                <Button
+                                    variant="text"
+                                    fullWidth
+                                    disabled={selectedModule ? false : true}
+                                    onClick={() => handleIsOpenCreateCourse(true)}
+                                    sx={{ display: "flex", justifyContent: "flex-start", textTransform: "capitalize", py : 1 }}
+                                >
+                                    <Add sx={{ mr : 1 }} />
+                                    <Typography variant="body2">Crear Curso</Typography>
+                                </Button>
+                            }
                             <Divider />
                             <ListCourse />
-                        </>}
+                        </>
+
                     </Grid>
                 </Grid>
             </CardContent>

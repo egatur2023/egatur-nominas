@@ -4,17 +4,24 @@ import { CalendarMonth, ExpandMore, FiberManualRecord } from '@mui/icons-materia
 import { useRouter } from "next/router";
 import { GroupPageSidebar, PageSidebar } from "resources/local/store.sidebar";
 import { useStoreSidebar } from "resources/local/store.sidebar";
+import { ModuleSystem, Permission, User } from "@prisma/client";
+import { useSession } from "next-auth/react";
+import { hasPermission } from "resources/functions/helpers.frontend";
 
-
-function ButtonPage({page} : {page : PageSidebar}){
+// permissions : (Permission & { module : ModuleSystem})[]
+function ButtonPage({page } : {page : PageSidebar }){
     const router = useRouter()
+    const { data } = useSession()
     const { currentPage , setCurrentPage } = useStoreSidebar()
     const handleClickButtonPage = (page : PageSidebar) => {
         setCurrentPage(page)
         router.push(page.path)
     }
 
-    return (
+
+
+    if( hasPermission(data?.user.role.permissions || [],page.permissions) != null){
+        return (
         <ListItemButton
         selected={currentPage === page}
         sx={{ mx : 2 , borderRadius : "8px" }}
@@ -23,7 +30,10 @@ function ButtonPage({page} : {page : PageSidebar}){
             <CalendarMonth fontSize="small" sx={{ mr : 2 }} />
             <ListItemText>{page.name}</ListItemText>
         </ListItemButton>
-    )
+        )
+    }
+
+    return <></>
 }
 
 
@@ -95,10 +105,10 @@ const AccordionSidebar = ( { items } : PropsItemSidebar ) => {
     return (
         <>
             {
-                items.map(item => (
+                items.map((item,index) => (
                     item.hasOwnProperty("path") ?
-                        <ButtonPage key={`ITENPAGE${item.name}`} page={item as PageSidebar}/>
-                        :<AccordionPage key={`ITENPAGE${item.name}`} group={item as GroupPageSidebar}/>
+                        <ButtonPage key={`ITENPAGE${item.name}${index}`} page={item as PageSidebar}/>
+                        :<AccordionPage key={`ACCORDION${item.name}`} group={item as GroupPageSidebar}/>
                 ))
             }
         </>

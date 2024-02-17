@@ -9,12 +9,14 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { useStoreSidebar } from 'resources/local/store.sidebar';
+import { Divider } from '@mui/material';
 
 
 export default function TopAppBar() {
 
+    const { data : user } = useSession()
     const { setToggleSidebar } = useStoreSidebar()
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
@@ -68,8 +70,12 @@ export default function TopAppBar() {
                         open={Boolean(anchorElUser)}
                         onClose={handleCloseUserMenu}
                     >
+                        <MenuItem>
+                            <Typography textAlign="center">{user?.user?.email}</Typography>
+                        </MenuItem>
+                        <Divider/>
                         <MenuItem onClick={handleCloseUserMenu}>
-                            <Typography textAlign="center">Perfil</Typography>
+                            <Typography textAlign="center">{user?.user?.role.name}</Typography>
                         </MenuItem>
                         <MenuItem onClick={handleLogOut}>
                             <Typography textAlign="center">Cerrar sesión</Typography>

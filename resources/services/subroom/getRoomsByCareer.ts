@@ -1,21 +1,32 @@
 import { prisma } from '@prisma/db'
-export async function getRoomsByCareer(careerId: number, dateStart: string, dateEnd: string) {
-    let result = await prisma.room.findMany({
+export async function getAdmissionsByAdmission(admission : string) {
+    return await prisma.register.findMany({
+        include : {
+            curricular : true
+        },
+        distinct : ["admision"],
         where : {
-            course : {
-                module : {
-                    curricularStructure : {
-                        careerId : careerId
-                    }
-                }
-            },
-            dateStart : {
-                gte : new Date(dateStart)
-            },
-            dateEnd : {
-                lte : new Date(dateEnd)
+            admision : admission
+        },
+    })
+
+    //obtener registros[student,carrer]
+    //
+    // return result
+}
+
+export async function getAdmissionsByAdmissionScheduleIn(admissions : string[]) {
+    console.log({ra : admissions})
+    return await prisma.register.findMany({
+        include : {
+            curricular : true
+        },
+        distinct : ["admision"],
+        where : {
+            admision : {
+                in : admissions
             }
         },
     })
-    return result
 }
+

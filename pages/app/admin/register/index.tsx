@@ -19,10 +19,11 @@ import { useMemo } from "react";
 import { useStoreRegister } from "resources/local/store.register";
 import DialogEditObservationRegister from "resources/components/register/dialog.edit.observation";
 import autoTable from 'jspdf-autotable'
-import { urlContentToDataUri } from "resources/functions/helpers.frontend";
+import { hasPermission, urlContentToDataUri } from "resources/functions/helpers.frontend";
+import { useSession } from "next-auth/react";
 
 export default function Register() {
-
+    const { data } = useSession()
     const filePDF = new jsPDF({
         format: "a4",
         unit: "px"
@@ -205,6 +206,8 @@ export default function Register() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     ],[])
 
+    const isAuthorizedForCreate = hasPermission(data?.user.role.permissions||[],'Nominas.create') != null
+
     if (isLoading) {
         return <Box
             display={"flex"}
@@ -239,12 +242,15 @@ export default function Register() {
                         Registros de Alumnos
                     </Typography>
 
-                    <Button
-                        variant="contained"
-                        onClick={handleOpen}
-                    >
-                        Agregar Registro
-                    </Button>
+                    {
+                        isAuthorizedForCreate &&
+                        <Button
+                            variant="contained"
+                            onClick={handleOpen}
+                        >
+                            Agregar Registro
+                        </Button>
+                    }
                 </Box>
 
                 <DataTable

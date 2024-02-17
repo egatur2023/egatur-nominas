@@ -1,38 +1,38 @@
 import API from "@api";
 import { LoadingButton } from "@mui/lab";
-import { Autocomplete, Breadcrumbs, Card, CardContent, Chip, Divider, Grid, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Breadcrumbs, Card, CardContent, Chip, Divider, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import { Career, CurricularStructure } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import DataTable from "resources/components/data.table";
 import { useStoreAdmissionListFilter } from "resources/local/store.admission.list.filter";
-import { ResultGetRoomsByCareer } from "resources/types";
+import { ResultGetAdmissionsByAdmission } from "resources/types";
 
 export default function AdmissionPage(){
 
     const router = useRouter()
-    const { setParam , careerId ,admision , dateStart , dateEnd , isLoading } = useStoreAdmissionListFilter()
-    const { data: careers, isLoading: isCareersLoading } = useQuery(["careersx"], async () => API.getCareers(),{
+    const { setFilterAdmission , careerName , month , year , schedule } = useStoreAdmissionListFilter()
+    const { data: careers, isLoading: isCareersLoading } = useQuery(["careers"], async () => API.getCareers(),{
         initialData : []
     })
 
-    const [groupAdmissions, setGroupAdmissions] = useState<Record<string,ResultGetRoomsByCareer>>({})
-    // const{ data : curriculars } = useQuery<CurricularStructure[]>(
-    //     ["curricularsx", careerId],
-    //     async () => API.getCurricularsByCareerId(careerId),
-    //     {
-    //         enabled : careerId > 0 ? true : false,
-    //         initialData : []
-    //     }
-    // )
+    const years = useMemo(() => Array.from({ length: 10 }, (_,i) => new Date().getFullYear() - i),[])
+    const months = useMemo(() => Array.from({ length: 12 }, (_,nm) => new Date(2000,nm,1).toLocaleDateString('es-ES', { month: 'long' }).toUpperCase()),[])
+    const schedules = useMemo(() => ["Mañana","Tarde","Noche","Todos"],[])
 
-    const { data : admissions } = useQuery<ResultGetRoomsByCareer>(["admissions", careerId, dateStart, dateEnd], async () => API.postFilterAdmissions({careerId,admision, dateStart, dateEnd}), {
-        enabled : careerId > 0 ? true : false,
+    const [groupAdmissions, setGroupAdmissions] = useState<Record<string,ResultGetAdmissionsByAdmission>>({})
+
+
+    const { data : admissions } = useQuery<ResultGetAdmissionsByAdmission>({
+        queryKey : ["admissions",careerName,month,year,schedule],
+        queryFn : async () => API.postFilterAdmissions({careerName,month,year,schedule}),
+        enabled : careerName.length > 0 ,
         initialData : [],
         onSuccess(data) {
             setGroupAdmissions(data.reduce((acc, current) => {
-                let year = parseInt(current.name.split("-")[2].trim())
+                // let year = parseInt(current.name.split("-")[2].trim())
+                let year = new Date(current.dateStart).getFullYear()
                 acc[year] = acc[year] || [];
                 acc[year].push(current);
                 return acc
@@ -53,43 +53,54 @@ export default function AdmissionPage(){
 
         <Stack marginTop={4} gap={2}>
             <Grid container spacing={2}>
-                <Grid item xs={12} lg={4}>
+                <Grid item xs={12} lg={3}>
                     <Autocomplete
                         fullWidth
                         options={careers}
-                        onChange={(e, career : Career | null) => setParam("careerId", career?.id)}
+                        onChange={(e, career : Career | null) => {
+                            setFilterAdmission("careerName", String(career?.name))
+                            // setCa("careerName", String(career?.name))
+                        }}
                         getOptionLabel={(option : Career| null) => (option?.name as string)}
                         renderInput={(params) => <TextField {...params} label="Carrera" />}
                         />
                 </Grid>
-                    {/* <Grid item xs={12} lg={3}>
-                    <Autocomplete
-                        fullWidth
-                        options={curriculars}
-                        onChange={ (e, curricular) => setParam("curricularId", curricular?.id) }
-                        getOptionLabel={option => (option.code as string)}
-                        renderInput={(params) => <TextField {...params} label="Malla curricular(Admisiones)" />}
-                        />
-                </Grid> */}
-                <Grid item xs={12} lg={4}>
-                    <TextField
-                        fullWidth
-                        type="date"
-                        label="Fecha de Inicio"
-                        defaultValue={dateStart}
-                        onChange={(e) => setParam("dateStart", e.target.value)} />
+
+                <Grid item xs={12} lg={3}>
+                        <FormControl fullWidth>
+                            <InputLabel id="year">Año</InputLabel>
+                            <Select id="year" name="year" value={String(year)} onChange={(e) => setFilterAdmission( "year" , String(e.target.value) )}>
+                                {
+
+                                    years.map((year , index) => ( <MenuItem key={`year${year}`} value={year}>{year}</MenuItem>))
+                                }
+                            </Select>
+                        </FormControl>
                 </Grid>
-                <Grid item xs={12} lg={4}>
-                    <TextField
-                        fullWidth
-                        type="date"
-                        label="Fecha Fin"
-                        defaultValue={dateEnd}
-                        onChange={(e) => setParam("dateEnd", e.target.value)} />
+                <Grid item xs={12} lg={3}>
+                    <FormControl fullWidth>
+                        <InputLabel id="month">Mes</InputLabel>
+                        <Select id="month" name="month" value={month} onChange={ (e) => setFilterAdmission("month" , String(e.target.value))}>
+                            <MenuItem value={""}>Todos</MenuItem>
+                            {
+
+                                months.map((_month,index) => ( <MenuItem key={`_month${_month}`} value={_month}>{_month}</MenuItem>))
+                            }
+                        </Select>
+                    </FormControl>
                 </Grid>
-                {/* <Grid item xs={12} lg={2}>
-                    <LoadingButton loading={isLoading} >Buscar</LoadingButton>
-                </Grid> */}
+                <Grid item xs={12} lg={3}>
+                    <FormControl fullWidth>
+                        <InputLabel id="schedule">Turno</InputLabel>
+                        <Select id="schedule" name="schedule" value={schedule}  onChange={ (e) => setFilterAdmission("schedule" , String(e.target.value))}>
+                            {/* <MenuItem value={""}>Todos</MenuItem> */}
+                            {
+                                schedules.map((_schedule) => ( <MenuItem key={`_schedule${_schedule}`} value={_schedule}>{_schedule}</MenuItem>))
+                            }
+                        </Select>
+                    </FormControl>
+                </Grid>
+
 
             </Grid>
             {
@@ -107,8 +118,8 @@ export default function AdmissionPage(){
                                 </Typography>
                                 <Stack direction="row" gap={2} flexWrap="wrap">
                                 {
-                                    groupAdmissions[groupYear].map( (row) => (
-                                        <Chip key={`AD${row.courseId}${row.name}`} label={row.name} onClick={() => handleClickRoom(row.id)} />
+                                    groupAdmissions[groupYear].map( (row,i) => (
+                                        <Chip key={`AD${i}`} label={`${row.admision} (${row.curricular.code})`} onClick={() => handleClickRoom(row.admision)} />
                                     ))
                                 }
                                 </Stack>

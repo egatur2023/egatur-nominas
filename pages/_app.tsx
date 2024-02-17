@@ -1,6 +1,6 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-import { SessionProvider } from "next-auth/react"   
+import { SessionProvider } from "next-auth/react"
 import { useRouter } from 'next/router'
 import SystemLayout from '../resources/layouts/SystemLayout'
 import clientSideEmotionCache from '../mui/clientSideEmotionCache'
@@ -27,7 +27,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     )
     const { session } = pageProps
   const router = useRouter()
-  const isPrivateRoute = router.pathname.startsWith("/app")     
+  const isPrivateRoute = router.pathname.startsWith("/app")
   const emotionCache = clientEmotionCache
    // Create a client
   return (
@@ -37,7 +37,6 @@ function MyApp({ Component, pageProps }: AppProps) {
           <ReactQueryDevtools initialIsOpen={false} />
           <CacheProvider value={emotionCache}>
             <ThemeProvider theme={theme}>
-              {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
               <CssBaseline />
               {
                 (() =>

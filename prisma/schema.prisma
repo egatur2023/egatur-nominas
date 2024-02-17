@@ -78,14 +78,14 @@ model Teacher{
 }
 
 model User {
-  id          Int     @id @default(autoincrement())
-  email       String  @unique
-  password    String
-  username    String
-  role        TypeUser
-  requests    Request[]
-  @@index([email])
-//   @@index([password])
+    id          Int     @id @default(autoincrement())
+    email       String  @unique
+    password    String
+    username    String
+    roleId      Int     @default(0)
+    role        Role    @relation(fields: [roleId] , references: [id])
+    requests    Request[]
+    @@index([email])
     @@map("user")
 }
 
@@ -100,6 +100,7 @@ model Register {
     curricular              CurricularStructure     @relation(fields: [curricularId],references: [id])
     subscriptionsModule     SubscriptionModule[]
     observations            String                  @db.Text @default("")
+    admision                String                  @default("")
     @@map("register")
 }
 
@@ -129,9 +130,9 @@ model SubscriptionRoom {
 }
 
 model Room {
-  id              Int     @id @default(autoincrement())
+  id              Int           @id @default(autoincrement())
   name            String
-  schedule        String  @default("VACIO")
+  schedule        String        @default("VACIO")
   dateStart       DateTime
   dateEnd         DateTime
   courseId        Int
@@ -147,13 +148,14 @@ model Room {
 }
 
 model Attendance {
-    id                  Int         @id @default(autoincrement())
+    id                  Int                 @id @default(autoincrement())
     date                DateTime
-    subscriptionRoom    SubscriptionRoom @relation(fields: [subscriptionRoomId] , references: [id])
+    subscriptionRoom    SubscriptionRoom    @relation(fields: [subscriptionRoomId] , references: [id])
     subscriptionRoomId  Int
     stateAttendance     AttendanceState     @default(PENDIENTE)
     observation         String  @db.Text
     @@map("attendance")
+    @@index([subscriptionRoomId])
 }
 
 model Request {
@@ -169,6 +171,8 @@ model Request {
     subscriptionRoomId      Int
     reason                  String  @db.Text
     @@map("request")
+    @@index([subscriptionRoomId])
+    @@index([userId])
 }
 
 enum AttendanceState {
@@ -209,7 +213,44 @@ enum MonthEnum {
 //     TEORICO_PRACTICO //TEORICO / PRACTICO
 // }
 
+model Role {
+    id                      Int     @id @default(autoincrement())
+    name                    TypeUser
+    permissions             Permission[]
+    users                   User[]
+    @@map("role")
+}
+
+model Permission {
+    id                      Int                 @id @default(autoincrement())
+    roleId                  Int
+    role                    Role                @relation(fields: [roleId] , references: [id])
+    moduleId                Int
+    module                  ModuleSystem        @relation(fields: [moduleId] , references: [id])
+    create                  Boolean
+    read                    Boolean
+    update                  Boolean
+    delete                  Boolean
+    @@map("permission")
+}
+
+model ModuleSystem {
+    id                      Int     @id @default(autoincrement())
+    name                    String
+    permissions             Permission[]
+    @@map("modulesystem")
+}
+
+enum ActionPermission {
+    CREATE
+    READ
+    UPDATE
+    DELETE
+}
+
 enum TypeUser {
     ADMIN
     SUPERVISOR
+    ADVISOR
+    GUEST
 }

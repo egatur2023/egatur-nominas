@@ -20,3 +20,16 @@ export const UI = {
         }
     }
 }
+
+
+export const MODULES = {
+    Módulos  : 'Módulos',
+    Usuarios  : 'Usuarios',
+    Solicitudes  : 'Solicitudes',
+    Malla_Curricular  : 'Malla Curricular',
+    Nominas  : 'Nominas',
+    Docentes  : 'Docentes',
+    Admisiones  : 'Admisiones',
+    Roles  : 'Roles',
+    Reporte_General  : 'Reporte General',
+}

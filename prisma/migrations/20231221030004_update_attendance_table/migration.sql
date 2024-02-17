@@ -133,7 +133,7 @@ CREATE TABLE `Room` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Attendance` (
+CREATE TABLE `attendance` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `date` DATETIME(3) NOT NULL,
     `subscriptionRoomId` INTEGER NOT NULL,

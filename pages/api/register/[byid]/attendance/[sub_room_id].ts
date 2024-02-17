@@ -25,6 +25,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 
     const data = {
+        courseName : subscriptionRoom?.courseName || "-----",
+        teacherFullName : subscriptionRoom?.room.teacher?.fullName || "-----",
         studentFullname : resultCourse?.register.student.fullName || "-----",
         dateAdmision : subscriptionRoom?.room.name || "-----",
         schedule : subscriptionRoom?.room.schedule || "-----",

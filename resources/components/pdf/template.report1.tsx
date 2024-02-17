@@ -62,7 +62,7 @@ export default function TemplateReport1({subRooms = []} : { subRooms : DtoDataRe
             </div>
             {
                 groups && groups.map((subRooms , index) => (
-                    <div style={{ maxHeight : "108mm" }}>
+                    <div style={{ maxHeight : "108mm" }} key={`${index}${subRooms.length}`}>
                         <Table>
                             <thead>
                                 <TRow>
