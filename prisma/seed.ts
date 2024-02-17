@@ -273,16 +273,16 @@ async function main() {
     //     console.log(`${register?.curricular.career.name == "Barismo" ? "BRM" : register.curricular.career.name.substring(0,2).toUpperCase()}-${register.dateStart.toLocaleDateString('es-ES', { month: 'short'}).toUpperCase()}-${register.dateStart.getFullYear()}-${register.scheduleAdmision.substring(0,1)}`)
     // })
 
-    // Promise.all(registers.map( async register => {
-    //     await prisma.register.update({
-    //         where : {
-    //             id : register.id
-    //         },
-    //         data : {
-    //             admision : `${register?.curricular.career.name == "Barismo" ? "BRM" : register.curricular.career.name.substring(0,2).toUpperCase()}-${register.dateStart.toLocaleDateString('es-ES', { month: 'short'}).toUpperCase()}-${register.dateStart.getFullYear()}-${register.scheduleAdmision.substring(0,1)}`
-    //         }
-    //     })
-    // }))
+    Promise.all(registers.map( async register => {
+        await prisma.register.update({
+            where : {
+                id : register.id
+            },
+            data : {
+                admision : `${register?.curricular.career.name == "Barismo" ? "BRM" : register.curricular.career.name.substring(0,2).toUpperCase()}-${register.dateStart.toLocaleDateString('es-ES', { month: 'short'}).toUpperCase()}-${register.dateStart.getFullYear()}-${register.scheduleAdmision.substring(0,1)}`
+            }
+        })
+    }))
 
 
     // GENERATED ALL ATTENDACES FOR COURSE

@@ -32,5 +32,13 @@ export default NextAuth ({
             }
             return session
         },
+        async signIn(params) {
+            const { account, profile } = params
+            if (account && profile && account.provider === "google" ) {
+                const user = await loginUseCase({ email : String(profile?.email) })
+                return user && user.email === String(profile?.email) ? true : false
+            }
+            return false
+        },
     },
 });
