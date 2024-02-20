@@ -125,9 +125,9 @@ export default function Register() {
         initialData : []
     })
 
-    const isAuthorizedForReadEnrollment = hasPermission(data?.user.role.permissions||[],'Matrícula.read') != null
-    const isAuthorizedForReadRegister = hasPermission(data?.user.role.permissions||[],'Nominas.read') != null
-    const isAuthorizedForUpdateRegister = hasPermission(data?.user.role.permissions||[],'Nominas.update') != null
+    const isAuthorizedForReadEnrollment = hasPermission(data?.user.role.permissions||[],'Matrícula.read')
+    const isAuthorizedForReadRegister = hasPermission(data?.user.role.permissions||[],'Nominas.read')
+    const isAuthorizedForUpdateRegister = hasPermission(data?.user.role.permissions||[],'Nominas.update')
 
     const columnHelper = createColumnHelper<DtoResRegister>()
 
@@ -220,7 +220,7 @@ export default function Register() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     ],[isAuthorizedForReadEnrollment])
 
-    const isAuthorizedForCreate = hasPermission(data?.user.role.permissions||[],'Nominas.create') != null
+    const isAuthorizedForCreate = hasPermission(data?.user.role.permissions||[],'Nominas.create')
 
     // if (isLoading) {
     //     return <Box

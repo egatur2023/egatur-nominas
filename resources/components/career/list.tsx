@@ -9,9 +9,12 @@ import { CareerToEdit } from "resources/types";
 import DialogBasic from "../dialog.basic";
 import EditCareer from "./edit";
 import { useStoreCurricular } from "resources/local/store.curricular";
+import { useSession } from "next-auth/react";
+import { hasPermission } from "resources/functions/helpers.frontend";
 
 export default function ListCareer() {
 
+    const { data } = useSession()
     const styles: SxProps = {
         height: {
             md: "calc(100vh - 64px - 32px - 128px)",
@@ -45,6 +48,8 @@ export default function ListCareer() {
     const handleClickRowCareer = (career: any) => {
         selectCareer(career)
     }
+
+    const isAuthorizedToUpdateCareer = hasPermission(data?.user.role.permissions||[],'Malla Curricular.update')
 
     if (isLoading) {
         return <Box
@@ -85,11 +90,14 @@ export default function ListCareer() {
                             }}>
                             <TableCell sx={{ pl: 5 }}>{career.name}</TableCell>
                             <TableCell sx={{ pl: 5 }}>
-                                <IconButton size="small"
-                                    onClick={e => handleClickMenu(e, career)}
-                                >
-                                    <MoreVert fontSize="small" />
-                                </IconButton>
+                            {
+                                isAuthorizedToUpdateCareer &&
+                                    <IconButton size="small"
+                                        onClick={e => handleClickMenu(e, career)}
+                                    >
+                                        <MoreVert sx={{ fontSize : 16 }} />
+                                    </IconButton>
+                            }
                             </TableCell>
                         </TableRow>
                     ))}

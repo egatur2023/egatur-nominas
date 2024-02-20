@@ -69,7 +69,7 @@ export default function AdmissionPage(){
                 <Grid item xs={12} lg={3}>
                         <FormControl fullWidth>
                             <InputLabel id="year">Año</InputLabel>
-                            <Select id="year" name="year" value={String(year)} onChange={(e) => setFilterAdmission( "year" , String(e.target.value) )}>
+                            <Select label="Año" id="year" name="year" value={String(year)} onChange={(e) => setFilterAdmission( "year" , String(e.target.value) )}>
                                 {
 
                                     years.map((year , index) => ( <MenuItem key={`year${year}`} value={year}>{year}</MenuItem>))
@@ -80,8 +80,7 @@ export default function AdmissionPage(){
                 <Grid item xs={12} lg={3}>
                     <FormControl fullWidth>
                         <InputLabel id="month">Mes</InputLabel>
-                        <Select id="month" name="month" value={month} onChange={ (e) => setFilterAdmission("month" , String(e.target.value))}>
-                            <MenuItem value={""}>Todos</MenuItem>
+                        <Select label="Mes" id="month" name="month" value={month} onChange={ (e) => setFilterAdmission("month" , String(e.target.value))}>
                             {
 
                                 months.map((_month,index) => ( <MenuItem key={`_month${_month}`} value={_month}>{_month}</MenuItem>))
@@ -92,7 +91,7 @@ export default function AdmissionPage(){
                 <Grid item xs={12} lg={3}>
                     <FormControl fullWidth>
                         <InputLabel id="schedule">Turno</InputLabel>
-                        <Select id="schedule" name="schedule" value={schedule}  onChange={ (e) => setFilterAdmission("schedule" , String(e.target.value))}>
+                        <Select label="Turno" id="schedule" name="schedule" value={schedule}  onChange={ (e) => setFilterAdmission("schedule" , String(e.target.value))}>
                             {/* <MenuItem value={""}>Todos</MenuItem> */}
                             {
                                 schedules.map((_schedule) => ( <MenuItem key={`_schedule${_schedule}`} value={_schedule}>{_schedule}</MenuItem>))

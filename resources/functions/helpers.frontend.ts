@@ -12,8 +12,8 @@ export function urlContentToDataUri(url : string){
             }) )
 }
 
-export function hasPermission(permissions : (Permission & { module : ModuleSystem})[],stringPermission : MODULE_VALUES){
-    return permissions.find( permission => {
+export function hasPermission(permissions : (Permission & { module : ModuleSystem})[],stringPermission : MODULE_VALUES) : boolean {
+    let isAuthorized = permissions.find( permission => {
         const pagePermission = stringPermission.toLowerCase()
         let userPermission : string = ""
         let isAuthorized = false
@@ -38,9 +38,10 @@ export function hasPermission(permissions : (Permission & { module : ModuleSyste
         if(result && isAuthorized){
             console.log(`found => (${isAuthorized})${pagePermission.toLowerCase() } === ${userPermission} [${result}]`)
             return true
-        }else{
-            return false
         }
 
+        return false
+
     })
+    return isAuthorized != undefined
 }

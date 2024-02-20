@@ -8,6 +8,8 @@ import { DtoEditCurricular } from "resources/types";
 import DialogBasic from "../dialog.basic";
 import EditCurricular from "./edit";
 import { useStoreCurricular } from "resources/local/store.curricular";
+import { hasPermission } from "resources/functions/helpers.frontend";
+import { useSession } from "next-auth/react";
 
 export default function ListCurricularStructure() {
     const styles: SxProps<Theme> = {
@@ -16,6 +18,7 @@ export default function ListCurricularStructure() {
             xs: "calc(128px)",
         },
     }
+    const { data } = useSession()
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
     const { selectedCareer , selectCurricular } = useStoreCurricular()
     const careerId = selectedCareer?.id || 0
@@ -57,6 +60,8 @@ export default function ListCurricularStructure() {
     const handleClickRowCurricular = (curricular: any) => {
         selectCurricular(curricular)
     }
+
+    const isAuthorizedToUpdateCareer = hasPermission(data?.user.role.permissions||[],'Malla Curricular.update')
 
     if (isFetching) {
         return <Box
@@ -101,12 +106,15 @@ export default function ListCurricularStructure() {
                             <TableCell align="left">{curricular.code}</TableCell>
                             <TableCell align="left">{curricular.isRegular ? "Regular" : "Irregular"}</TableCell>
                             <TableCell sx={{ pl: 5 }}>
-                                <IconButton
-                                    size="small"
-                                    onClick={(e) => handleClickMenu(e, curricular)}
-                                >
-                                    <MoreVert fontSize="small" />
-                                </IconButton>
+                                {
+                                    isAuthorizedToUpdateCareer &&
+                                    <IconButton
+                                        size="small"
+                                        onClick={(e) => handleClickMenu(e, curricular)}
+                                    >
+                                        <MoreVert sx={{ fontSize : 16 }} />
+                                    </IconButton>
+                                }
                             </TableCell>
                         </TableRow>
                     ))}

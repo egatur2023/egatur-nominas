@@ -10,7 +10,7 @@ import { useStoreRole } from "resources/local/store.role";
 export default function PermissionPage(){
     const { data } = useSession()
     const { setIsOpenCreate } = useStoreRole()
-    const isAuthorized = hasPermission(data?.user.role.permissions||[],'Roles.create') != null
+    const isAuthorized = hasPermission(data?.user.role.permissions||[],'Roles.create')
     return (
         <Stack>
             {

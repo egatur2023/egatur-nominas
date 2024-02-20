@@ -9,6 +9,8 @@ import { CoursesByModuleId1, DtoEditCourse } from 'resources/types';
 import DialogBasic from '../dialog.basic';
 import EditCourse from './edit';
 import { useStoreCurricular } from 'resources/local/store.curricular';
+import { hasPermission } from 'resources/functions/helpers.frontend';
+import { useSession } from 'next-auth/react';
 export default function ListCourse() {
     const styles: SxProps<Theme> = {
         height: {
@@ -16,6 +18,7 @@ export default function ListCourse() {
             xs: "calc(128px)",
         },
     }
+    const { data } = useSession()
     const { selectedModule, selectedCurricular, selectedCareer } = useStoreCurricular()
     const router = useRouter()
     const moduleId = selectedModule?.id || 0
@@ -41,6 +44,8 @@ export default function ListCourse() {
     const handleCloseMenu = () => {
         setAnchorEl(null);
     }
+
+    const isAuthorizedToUpdateCareer = hasPermission(data?.user.role.permissions||[],'Malla Curricular.update')
 
     // type CourseWithMod = Course & { module : Module}
 
@@ -116,11 +121,14 @@ export default function ListCourse() {
                                 <TableCell align="left">{course.type}</TableCell>
                                 <TableCell align="left">{course.sessions}</TableCell>
                                 <TableCell align="left">
-                                    <IconButton size="small"
-                                        onClick={e => handleClickMenu(e, course)}
-                                    >
-                                        <MoreVert fontSize="small" />
-                                    </IconButton>
+                                    {
+                                        isAuthorizedToUpdateCareer &&
+                                        <IconButton size="small"
+                                            onClick={e => handleClickMenu(e, course)}
+                                        >
+                                            <MoreVert sx={{ fontSize : 16 }} />
+                                        </IconButton>
+                                    }
                                 </TableCell>
                             </TableRow>
                         ))

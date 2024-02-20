@@ -20,7 +20,7 @@ function ButtonPage({page } : {page : PageSidebar }){
 
 
 
-    if( hasPermission(data?.user.role.permissions || [],page.permissions) != null){
+    if( hasPermission(data?.user.role.permissions || [],page.permissions) ){
         return (
         <ListItemButton
         selected={currentPage === page}

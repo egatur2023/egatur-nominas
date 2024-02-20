@@ -8,9 +8,12 @@ import { DtoEditModule } from "resources/types";
 import DialogBasic from "../dialog.basic";
 import EditModule from "./edit";
 import { useStoreCurricular } from "resources/local/store.curricular";
+import { hasPermission } from "resources/functions/helpers.frontend";
+import { useSession } from "next-auth/react";
 
 export default function ListModule() {
 
+    const {data} = useSession()
     const { selectedCurricular , selectModule } = useStoreCurricular()
     const [modules, setModules] = useState<Module[]>([])
     const curricularId = selectedCurricular?.id || 0
@@ -46,6 +49,8 @@ export default function ListModule() {
         handleCloseMenu()//quitar referencia del menu
         setIsOpenEditModule(true)//abrir modal
     }
+
+    const isAuthorizedToUpdateCareer = hasPermission(data?.user.role.permissions||[],'Malla Curricular.update')
 
     if (isFetching) {
         return <Box
@@ -88,11 +93,14 @@ export default function ListModule() {
                             >
                                 <TableCell align="left">{module.name}</TableCell>
                                 <TableCell sx={{ pl: 5 }}>
-                                    <IconButton size="small"
-                                        onClick={(e) => handleClickMenu(e, module)}
-                                    >
-                                        <MoreVert fontSize="small" />
-                                    </IconButton>
+                                    {
+                                        isAuthorizedToUpdateCareer &&
+                                        <IconButton size="small"
+                                            onClick={(e) => handleClickMenu(e, module)}
+                                        >
+                                            <MoreVert sx={{ fontSize : 16 }} />
+                                        </IconButton>
+                                    }
                                 </TableCell>
                             </TableRow>
                         ))

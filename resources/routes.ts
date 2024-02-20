@@ -60,12 +60,12 @@ export const itemsSidebarAdmin : AreaSidebar[] =
                     path : '/app/super/request',
                     permissions : 'Solicitudes.read'
                 },
-                {
-                    name : 'Nominas',
-                    title : 'Nominas',
-                    path : '/app/super/register',
-                    permissions : 'Nominas.read'
-                },
+                // {
+                //     name : 'Nominas',
+                //     title : 'Nominas',
+                //     path : '/app/super/register',
+                //     permissions : 'Nominas.read'
+                // },
             ]
 
         },

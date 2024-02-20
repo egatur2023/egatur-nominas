@@ -43,7 +43,7 @@ export default function Career(props : any) {
         setIsOpenCreateCourse(isOpen)
     }
 
-    const isAuthorized = hasPermission(data?.user.role.permissions||[],'Malla Curricular.create') != null
+    const isAuthorized = hasPermission(data?.user.role.permissions||[],'Malla Curricular.create')
 
     return <Box sx={{ marginTop: 4 }}
         mx={"2rem"}
