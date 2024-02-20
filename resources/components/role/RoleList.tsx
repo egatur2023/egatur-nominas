@@ -62,7 +62,7 @@ export default function RoleList(){
                                 <TableCell>Crear</TableCell>
                                 <TableCell>Ver</TableCell>
                                 <TableCell>Editar</TableCell>
-                                <TableCell>Eliminar</TableCell>
+                                {/* <TableCell>Eliminar</TableCell> */}
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -79,9 +79,9 @@ export default function RoleList(){
                                         <TableCell>
                                             <Checkbox disabled={isSubmitting} checked={permission.update} onChange={() => handleChangePermission({...permission},"update")}/>
                                         </TableCell>
-                                        <TableCell>
+                                        {/* <TableCell>
                                             <Checkbox disabled={isSubmitting} checked={permission.delete} onChange={() => handleChangePermission({...permission},"delete")}/>
-                                        </TableCell>
+                                        </TableCell> */}
                                     </TableRow>
                                 ))
                             }

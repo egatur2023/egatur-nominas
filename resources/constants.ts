@@ -33,4 +33,5 @@ export const MODULES = {
     Roles  : 'Roles',
     Reporte_General  : 'Reporte General',
     Matrícula  : 'Matrícula',
+    Aulas  : 'Aulas',
 }

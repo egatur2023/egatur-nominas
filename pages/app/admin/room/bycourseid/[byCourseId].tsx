@@ -9,11 +9,13 @@ import CreateRoom from "resources/components/room/create"
 import EditRoom from "resources/components/room/edit"
 import { DtoEditRoom, RoomsByCourseId1 } from "resources/types"
 import { DateTime } from "luxon"
+import { hasPermission } from "resources/functions/helpers.frontend"
+import { useSession } from "next-auth/react"
 
 export default function RoomsByCourseId(){
 
     const router = useRouter()
-
+    const {data} = useSession()
     const byCourseId : number = parseInt(router.query?.byCourseId as string,10)
     const [isOpenCreateRoom , setIsOpenCreateRoom] = useState<boolean>(false)
     const { data : rooms , isLoading } = useQuery<RoomsByCourseId1>(["api/rooms/bycourseid" , byCourseId] , async () => await API.getRoomsByCourseId(byCourseId), { enabled : byCourseId ? true : false , initialData : []})
@@ -23,6 +25,9 @@ export default function RoomsByCourseId(){
         setRoomToEdit(room)
         setIsOpenEditRoom(true)
     }
+
+    const isAuthorizedToCreateAulas = hasPermission(data?.user.role.permissions||[],'Aulas.create')
+    const isAuthorizedToUpdateAulas = hasPermission(data?.user.role.permissions||[],'Aulas.update')
 
     if(isLoading){
         return <Box
@@ -45,7 +50,9 @@ export default function RoomsByCourseId(){
             </DialogBasic>
 
             <Box display="flex" justifyContent="flex-end">
-                <Button variant="contained" onClick={() => setIsOpenCreateRoom(true) }> <Add/> Nuevo Aula</Button>
+                {   isAuthorizedToCreateAulas &&
+                    <Button variant="contained" onClick={() => setIsOpenCreateRoom(true) }> <Add/> Nuevo Aula</Button>
+                }
             </Box>
 
             <Card variant="outlined">
@@ -68,6 +75,7 @@ export default function RoomsByCourseId(){
                                     <TableCell>Fecha</TableCell>
                                     <TableCell>Hora</TableCell>
                                     <TableCell>Frecuencia</TableCell>
+                                    { isAuthorizedToUpdateAulas && <TableCell></TableCell>}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -81,9 +89,12 @@ export default function RoomsByCourseId(){
                                             <TableCell>{room.hourStart} - {room.hourEnd}</TableCell>
                                             <TableCell>{room.frecuency || "No existe"}</TableCell>
                                             <TableCell>
-                                                <IconButton size="medium" onClick={() => handleClickEdit(room)}>
-                                                    <Edit fontSize="small"/>
-                                                </IconButton>
+                                                {
+                                                    isAuthorizedToUpdateAulas &&
+                                                        <IconButton size="medium" onClick={() => handleClickEdit(room)}>
+                                                        <Edit fontSize="small"/>
+                                                    </IconButton>
+                                                }
                                             </TableCell>
                                         </TableRow>
                                     })

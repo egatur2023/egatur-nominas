@@ -46,6 +46,7 @@ export default function ListCourse() {
     }
 
     const isAuthorizedToUpdateCareer = hasPermission(data?.user.role.permissions||[],'Malla Curricular.update')
+    const isAuthorizedToReadAulas = hasPermission(data?.user.role.permissions||[],'Aulas.read')
 
     // type CourseWithMod = Course & { module : Module}
 
@@ -121,14 +122,13 @@ export default function ListCourse() {
                                 <TableCell align="left">{course.type}</TableCell>
                                 <TableCell align="left">{course.sessions}</TableCell>
                                 <TableCell align="left">
-                                    {
-                                        isAuthorizedToUpdateCareer &&
-                                        <IconButton size="small"
-                                            onClick={e => handleClickMenu(e, course)}
-                                        >
-                                            <MoreVert sx={{ fontSize : 16 }} />
-                                        </IconButton>
-                                    }
+
+                                    <IconButton size="small"
+                                        onClick={e => handleClickMenu(e, course)}
+                                    >
+                                        <MoreVert sx={{ fontSize : 16 }} />
+                                    </IconButton>
+
                                 </TableCell>
                             </TableRow>
                         ))
@@ -143,7 +143,9 @@ export default function ListCourse() {
             open={Boolean(anchorEl)}
             onClose={handleCloseMenu}
         >
-            <MenuItem
+            {
+                isAuthorizedToUpdateCareer &&
+                <MenuItem
                 sx={{
                     display: "flex",
                     justifyContent: "space-around",
@@ -152,15 +154,19 @@ export default function ListCourse() {
                 onClick={handleOpenEditCourse}>
                 <Edit fontSize="small" sx={{ mr: 1 }} />  <Typography>Editar</Typography>
             </MenuItem>
-            <MenuItem
-                sx={{
-                    display: "flex",
-                    justifyContent: "space-around",
-                    alignItems: "center"
-                }}
-                onClick={() => handleGoToRoomsByCourseId()}>
-                <ApartmentRounded fontSize="small" sx={{ mr: 1 }} />  <Typography>Admisiones</Typography>
-            </MenuItem>
+            }
+            {
+                isAuthorizedToReadAulas &&
+                <MenuItem
+                    sx={{
+                        display: "flex",
+                        justifyContent: "space-around",
+                        alignItems: "center"
+                    }}
+                    onClick={() => handleGoToRoomsByCourseId()}>
+                    <ApartmentRounded fontSize="small" sx={{ mr: 1 }} />  <Typography>Aulas</Typography>
+                </MenuItem>
+            }
         </Menu>
     </>)
 }
