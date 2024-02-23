@@ -57,7 +57,7 @@ export const itemsSidebarAdmin : AreaSidebar[] =
                 {
                     name : 'Solicitudes',
                     title : 'Solicitudes de cambio de nota',
-                    path : '/app/super/request',
+                    path : '/app/admin/request',
                     permissions : 'Solicitudes.read'
                 },
                 // {

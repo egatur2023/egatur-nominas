@@ -14,7 +14,8 @@ import DialogBasic from "../dialog.basic";
 
 export default function DialogEditRequestSuper(){
     const qc = useQueryClient()
-    const { isOpenDialogEditForSuper , setIsOpenDialogEditForSuper , requestToEditForSuper  } = useStoreRequest()
+    const [isSending,setIsSending] = useState(false)
+    const { isOpenDialogEditForSuper , setIsOpenDialogEditForSuper , requestToEditForSuper ,setRequestToEditForSuper  } = useStoreRequest()
 
     const [documents , setDocuments] = useState<{doc1 : File | any , doc2 : File|any , doc3 : File|any}>({
         doc1 : null,
@@ -31,17 +32,19 @@ export default function DialogEditRequestSuper(){
         doc1 : { name :"" , extension : "" , id : ""},
         doc2 : { name :"" , extension : "" , id : ""},
         doc3 : { name :"" , extension : "" , id : ""},
-    };
+    }
+
     const [message , setMessage] = useState<string>("")
     const mutation = useMutation(API.putRequestSuper,{
         onSuccess(data, variables, context) {
-            qc.invalidateQueries(["api/request/super"])
-            setSubmitting(false)
+            qc.invalidateQueries(["api/request/admin"])
+            setIsSending(false)
             resetForm()
             setIsOpenDialogEditForSuper(false)
+            setRequestToEditForSuper(null)
         },
         onError(error : any, variables, context) {
-            setSubmitting(false)
+            setIsSending(false)
             if(axios.isAxiosError(error) && error){
                 const err : any = error as AxiosError
                 setMessage(String(err?.response?.data?.message))
@@ -72,7 +75,7 @@ export default function DialogEditRequestSuper(){
             doc2 : {...documentsParsed.doc2},
             doc3 : {...documentsParsed.doc3},
         },
-        enableReinitialize : true,
+        enableReinitialize : requestToEditForSuper != null,
         async onSubmit(validatedRequest ) {
             setSubmitting(true)
             const formRequest = new FormData()
@@ -85,12 +88,14 @@ export default function DialogEditRequestSuper(){
         },
     })
 
-    const onChangeFile = async (e : React.ChangeEvent<HTMLInputElement> , property : string) => {
+    // console.log(isSubmitting)
+
+    const onChangeFile = (e : React.ChangeEvent<HTMLInputElement> , property : string) => {
         if(!e.target.files) return ;
         const file = e.target.files[0];
         let fileName = file.name.split(".")
         let extension = fileName.pop()?.toUpperCase() || ""
-        await setFieldValue( property , { name : fileName.join() , extension })
+        setFieldValue( property , { name : fileName.join() , extension })
         setDocuments({...documents , [property] : file})
     }
 
@@ -133,15 +138,15 @@ export default function DialogEditRequestSuper(){
                         <TextField
                             label="Documento 1"
                             name="doc1"
-                            placeholder={request.doc1.name || "Carga un archivo por favor."}
+                            value={request.doc1.name}
                             onChange={async(e) => await setFieldValue("doc1", { ...request.doc1 , name : String(e.target.value) } )}
                             error={touched.doc1 && Boolean(errors.doc1)}
                             helperText={errors.doc1?.name || ""}
-                            disabled={!Boolean(documents.doc1)}
                             InputLabelProps={{
                                 shrink : Boolean(request.doc1)
                             }}
                             InputProps={{
+                                readOnly: true,
                                 endAdornment :  (
                                     <>
                                     {request.doc1.extension}
@@ -157,13 +162,13 @@ export default function DialogEditRequestSuper(){
                         />
                         <TextField
                             label="Documento 2"
-                            placeholder={request.doc2.name || "Carga un archivo por favor."}
+                            value={request.doc2.name}
                             onChange={async(e) => await setFieldValue("doc2", { ...request.doc2 , name : String(e.target.value) } )}
-                            disabled={!Boolean(documents.doc2)}
                             InputLabelProps={{
                                 shrink : Boolean(request.doc2)
                             }}
                             InputProps={{
+                                readOnly: true,
                                 endAdornment :  (
                                     <>
                                     {request.doc2.extension}
@@ -179,13 +184,13 @@ export default function DialogEditRequestSuper(){
                         />
                         <TextField
                             label="Documento 3"
-                            placeholder={request.doc3.name || "Carga un archivo por favor."}
+                            value={request.doc3.name}
                             onChange={async(e) => await setFieldValue("doc3",{ ...request.doc3 , name : String(e.target.value) })}
-                            disabled={!Boolean(documents.doc3)}
                             InputLabelProps={{
                                 shrink : Boolean(request.doc3)
                             }}
                             InputProps={{
+                                readOnly: true,
                                 endAdornment :  (
                                     <>
                                     {request.doc3.extension}
@@ -213,12 +218,13 @@ export default function DialogEditRequestSuper(){
                 }
                 <Box sx={{ display : "flex" , justifyContent : "flex-end" }}>
                     <Button
-                        variant="contained"
-                        disabled={isSubmitting}
-                        endIcon={isSubmitting ? <CircularProgress size={10}></CircularProgress> : <></>}
+                        variant="outlined"
+                        disabled={isSending}
+                        endIcon={isSending ? <CircularProgress size={10}></CircularProgress> : <></>}
                         onClick={(e) => {
-                            //@ts-ignore
-                            handleSubmit(e)
+                            handleSubmit()
+                            setIsSending(true)
+                            console.log("editado")
                         }}
                     >Actualizar</Button>
                 </Box>

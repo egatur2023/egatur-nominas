@@ -17,7 +17,7 @@ export function hasPermission(permissions : (Permission & { module : ModuleSyste
         const pagePermission = stringPermission.toLowerCase()
         let userPermission : string = ""
         let isAuthorized = false
-        console.log(`------FINDING => ${stringPermission} { c : ${permission.create} ,r : ${permission.read} ,u : ${permission.update},d : ${permission.delete}}`,)
+        // console.log(`------FINDING => ${stringPermission} { c : ${permission.create} ,r : ${permission.read} ,u : ${permission.update},d : ${permission.delete}}`,)
         if(stringPermission.includes("read")){
             userPermission = `${permission.module.name}.read`.toLowerCase()
             isAuthorized = permission.read
@@ -36,7 +36,7 @@ export function hasPermission(permissions : (Permission & { module : ModuleSyste
         }
         const result = pagePermission.toLowerCase() === userPermission
         if(result && isAuthorized){
-            console.log(`found => (${isAuthorized})${pagePermission.toLowerCase() } === ${userPermission} [${result}]`)
+            // console.log(`found => (${isAuthorized})${pagePermission.toLowerCase() } === ${userPermission} [${result}]`)
             return true
         }
 

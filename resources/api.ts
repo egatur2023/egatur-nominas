@@ -386,6 +386,7 @@ export default abstract class API {
     }
 
     static async putRequestAdmin(request: DtoEditRequestAdmin) {
+        console.log({request})
         return await instanceAxios.post('/request/admin/update', request)
     }
     static async postCurricular(newCurricular: DtoCreateCurricular) {
@@ -406,9 +407,9 @@ export default abstract class API {
     }
 
 
-    static async downloadDocumentById(fileId : string , extension : string){
+    static async downloadDocumentById(fileId : string , extension : string,fileName : string){
         try {
-            const res = fetch("http://localhost:3000/request/download",{
+            const res = fetch("/api/request/download",{
                 headers:{
                     'Content-Type' : 'application/json'
                 },
@@ -418,7 +419,7 @@ export default abstract class API {
             const status = (await res).status
             const blob =  await (await res).blob()
             if(status < 500){
-                saveAs(blob , `documento.${extension.toLowerCase()}`)
+                saveAs(blob , `${fileName}.${extension.toLowerCase()}`)
                 return true
             }
             return false

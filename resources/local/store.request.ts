@@ -11,10 +11,10 @@ type StoreRequest = {
 
     setIsOpenDialogCreate : (isOpen : boolean ) => void
     setSubRoomId : (id : number) => void
-    setRequestToEdit : (request : DtoResRequestsForAdmin) => void
+    setRequestToEdit : (request : DtoResRequestsForAdmin|null) => void
     setIsOpenDialogEdit : (isOpen : boolean ) => void
     setIsOpenDialogEditForSuper : (isOpen : boolean ) => void
-    setRequestToEditForSuper : (request : DtoResRequestsForSuper) => void
+    setRequestToEditForSuper : (request : DtoResRequestsForSuper|null) => void
 }
 
 export const useStoreRequest = create<StoreRequest>((set,get) => ({

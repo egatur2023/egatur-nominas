@@ -14,7 +14,7 @@ export default async function handler( req: NextApiRequest, res: NextApiResponse
             student : request.subscriptionRoom.subscriptionModule.register.student.fullName,
             userName : request.user.username,
             courseName : request.subscriptionRoom.courseName,
-            stateRequest : request.stateUpdate,
+            stateUpdate : request.stateUpdate,
             observation : request.observation,
             documents : request.documents,
             reason : request.reason,

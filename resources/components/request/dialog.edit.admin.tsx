@@ -20,28 +20,27 @@ type DocumentsRequestUploaded = {
 
 export default function DialogEditRequestAdmin(){
     const qc = useQueryClient()
+    const [isSending, setIsSending] = useState(false)
     const statesUpdateRequest : StateUpdate[] =  ["ACEPTADO","RECHAZADO","OBSERVADO"]
-    const { isOpenDialogEdit , setIsOpenDialogEdit , requestToEdit  } = useStoreRequest()
-    const documents : DocumentsRequestUploaded = useMemo(() => {
-
-        const initial = {
-            doc1 : { name : "" , id : "" , extension : ""} ,
-            doc2 : { name : "" , id : "" , extension : ""},
-            doc3 : { name : "" , id : "" , extension : ""},
-        }
-        const parsed = requestToEdit?.documents ? JSON.parse(String(requestToEdit?.documents)) : initial
-        return parsed
-    } ,[requestToEdit])
+    const { isOpenDialogEdit , setIsOpenDialogEdit , requestToEdit , setRequestToEdit  } = useStoreRequest()
+    const initial = {
+        doc1 : { name : "" , id : "" , extension : ""} ,
+        doc2 : { name : "" , id : "" , extension : ""},
+        doc3 : { name : "" , id : "" , extension : ""},
+    }
+    const documents = (requestToEdit?.documents ? JSON.parse(String(requestToEdit?.documents)) : initial) as DocumentsRequestUploaded
     const [message , setMessage] = useState<string>("")
     const mutation = useMutation(API.putRequestAdmin,{
         onSuccess(data, variables, context) {
             qc.invalidateQueries(["api/request/admin"])
-            setSubmitting(false)
+            setIsSending(false)
             resetForm()
             setIsOpenDialogEdit(false)
+            setRequestToEdit(null)
+            console.log(requestToEdit)
         },
         onError(error : any, variables, context) {
-            setSubmitting(false)
+            setIsSending(false)
             if(axios.isAxiosError(error) && error){
                 const err : any = error as AxiosError
                 setMessage(String(err?.response?.data?.message))
@@ -58,27 +57,24 @@ export default function DialogEditRequestAdmin(){
         handleSubmit ,
         errors ,
         touched ,
-        isSubmitting ,
-        setSubmitting ,
-        setFieldValue ,
         resetForm  } = useFormik<DtoEditRequestAdmin>({
         validationSchema : schemaEditRequestAdmin,
         initialValues : {
             requestId : requestToEdit?.requestId || 0,
             observation : requestToEdit?.observation || "",
-            stateRequest : requestToEdit?.stateRequest || "PENDIENTE"
+            stateUpdate : requestToEdit?.stateUpdate || "PENDIENTE"
 
         },
-        enableReinitialize : true,
+        enableReinitialize : requestToEdit != null,
         async onSubmit(validatedRequest) {
-            setSubmitting(true)
+            setIsSending(true)
             mutation.mutate(validatedRequest)
         },
     })
 
-    const handleDownload = async (fileId : string , extension : string) => {
+    const handleDownload = async (fileId : string , extension : string,fileName : string) => {
         if(fileId){
-            const isDownloaded = await API.downloadDocumentById(fileId,extension)
+            const isDownloaded = await API.downloadDocumentById(fileId,extension,fileName)
         }
     }
 
@@ -109,11 +105,11 @@ export default function DialogEditRequestAdmin(){
                             error={touched.observation && Boolean(errors.observation)}
                         />
 
-                        <FormControl error={ touched.stateRequest && Boolean(errors.stateRequest)}>
+                        <FormControl error={ touched.stateUpdate && Boolean(errors.stateUpdate)}>
                             <FormLabel>Estado de solicitud</FormLabel>
                             <RadioGroup
                             row
-                            name="stateRequest"
+                            name="stateUpdate"
                             onChange={handleChange}
                             >
                             {
@@ -121,13 +117,13 @@ export default function DialogEditRequestAdmin(){
                                     <FormControlLabel key={value}
                                     label={<Typography variant="body2">{`${value.charAt(0)}${value.slice(1).toLowerCase()}`}</Typography>}
                                     value={value}
-                                    checked={request.stateRequest == value}
+                                    checked={request.stateUpdate == value}
                                     control={<Radio size="small" />}
                                     />
                                 )
                             }
                             </RadioGroup>
-                            <FormHelperText>{errors.stateRequest}</FormHelperText>
+                            <FormHelperText>{errors.stateUpdate}</FormHelperText>
                         </FormControl>
 
                         <TableContainer>
@@ -147,7 +143,7 @@ export default function DialogEditRequestAdmin(){
                                                 <IconButton
                                                     color="secondary"
                                                     disabled={!Boolean(documents.doc1.name)}
-                                                    onClick={e => handleDownload(documents.doc1.id,documents.doc1.extension)}
+                                                    onClick={e => handleDownload(documents.doc1.id,documents.doc1.extension.toLocaleLowerCase(),documents.doc1.name)}
                                                 >
                                                     <Download/>
                                                 </IconButton>
@@ -157,18 +153,32 @@ export default function DialogEditRequestAdmin(){
                                         <TableCell>2</TableCell>
                                         <TableCell>{documents.doc2.name}</TableCell>
                                         <TableCell>
-                                            <IconButton color="secondary" disabled={!Boolean(documents.doc2.name)}>
-                                                <Download/>
-                                            </IconButton>
+                                            {
+                                                documents.doc2.name != "" && documents.doc2.id.length > 0 &&
+                                                <IconButton
+                                                    color="secondary"
+                                                    disabled={!Boolean(documents.doc2.name)}
+                                                    onClick={e => handleDownload(documents.doc2.id,documents.doc2.extension.toLocaleLowerCase(),documents.doc2.name)}
+                                                >
+                                                    <Download/>
+                                                </IconButton>
+                                            }
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>3</TableCell>
                                         <TableCell>{documents.doc3.name}</TableCell>
                                         <TableCell>
-                                            <IconButton color="secondary" disabled={!Boolean(documents.doc3.name)}>
-                                                <Download/>
-                                            </IconButton>
+                                            {
+                                                documents.doc3.name != "" && documents.doc3.id.length > 0 &&
+                                                <IconButton
+                                                    color="secondary"
+                                                    disabled={!Boolean(documents.doc3.name)}
+                                                    onClick={e => handleDownload(documents.doc3.id,documents.doc3.extension.toLocaleLowerCase(),documents.doc3.name)}
+                                                >
+                                                    <Download/>
+                                                </IconButton>
+                                            }
                                         </TableCell>
                                     </TableRow>
                                 </TableBody>
@@ -188,10 +198,10 @@ export default function DialogEditRequestAdmin(){
                 <Box sx={{ display : "flex" , justifyContent : "flex-end" }}>
                     <Button
                         variant="outlined"
-                        disabled={isSubmitting}
+                        disabled={isSending}
                         onClick={(e) => {
-                            //@ts-ignore
-                            handleSubmit(e)
+                            handleSubmit()
+                            // setIsSending(true)
                         }}
                     >Actualizar</Button>
                 </Box>

@@ -156,7 +156,7 @@ export declare type DtoEditTeacher = {
 export declare type DtoEditRequestAdmin = {
     requestId : number
     observation : string
-    stateRequest : StateUpdate
+    stateUpdate : StateUpdate
 }
 export declare type DtoEditRequestSuper = {
     requestId : number
@@ -346,7 +346,7 @@ export type DtoResRequestsForAdmin = {
     student : string
     userName : string
     courseName : string
-    stateRequest : StateUpdate
+    stateUpdate : StateUpdate
     observation : string
     documents : string
     reason : string

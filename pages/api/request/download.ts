@@ -9,7 +9,7 @@ export const config = {
 
 export default async function handler(req : NextApiRequest , res : NextApiResponse){
     const fileId = String(req.body.fileId)
-    const extension = String(req.body.extension).toLowerCase()
+    // const extension = String(req.body.extension).toLowerCase()
 
     if(req.body.fileId){
         try {

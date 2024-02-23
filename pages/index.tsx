@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { Container, Box, Grid, Typography, Button, TextField, Stack, Alert, CircularProgress } from '@mui/material'
 import { useFormik } from "formik"
@@ -9,6 +9,7 @@ import Image from "next/image";
 
 
 const Login = () => {
+    const { data : session} = useSession()
     const router = useRouter()
     const [isError , setIsError ] = useState<boolean>(false)
     const [isSuccess , setIsSuccess] = useState<boolean>(false)
@@ -35,6 +36,8 @@ const Login = () => {
 
         },
     });
+
+    console.log(session)
 
     return <div>
         <Container maxWidth="sm"
@@ -81,48 +84,7 @@ const Login = () => {
                             <Stack
                                 spacing={2}
                             >
-                                {/*
-                                    isError &&
-                                    <Alert severity="error">
-                                        Usuario y/o contraseña invalida(s)
-                                    </Alert>
-                             
-                                
-                                <TextField
-                                    fullWidth
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    label="Correo"
-                                    value={formik.values.email}
-                                    onChange={formik.handleChange}
-                                    error={formik.touched.email && Boolean(formik.errors.email)}
-                                    helperText={formik.touched.email && formik.errors.email}
-                                />
 
-                                <TextField
-                                    fullWidth
-                                    id="password"
-                                    name="password"
-                                    label="Password"
-                                    type="password"
-                                    value={formik.values.password}
-                                    onChange={formik.handleChange}
-                                    error={formik.touched.password && Boolean(formik.errors.password)}
-                                    helperText={formik.touched.password && formik.errors.password}
-                                />
-
-                                <Button
-                                    color={isSuccess ? "success" : "primary"}
-                                    disabled={formik.isSubmitting}
-                                    variant="contained"
-                                    fullWidth
-                                    type="submit"
-                                    endIcon={formik.isSubmitting ? <CircularProgress size={10}></CircularProgress> :  isSuccess ?  <Check/> : <></>}
-                                    >
-                                    { formik.isSubmitting ? "Verificando..." : "Ingresar" }
-                                </Button>
-                                */}
                                 <Button
                                         color={"primary"}
                                         variant="contained"

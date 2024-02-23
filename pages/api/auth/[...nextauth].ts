@@ -13,6 +13,13 @@ export default NextAuth ({
             clientSecret: "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"//production
             // clientId: "258258017705-dr6a45t8g5oa4peshg6r01f347kqlvvp.apps.googleusercontent.com",
             // clientSecret: "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"
+            ,authorization: {
+                params: {
+                  prompt: "consent",
+                  access_type: "offline",
+                  response_type: "code"
+                }
+              }
           })
     ],
     callbacks: {
