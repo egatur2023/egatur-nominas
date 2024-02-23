@@ -52,7 +52,7 @@ export default function RequestIndex(){
             columnHelper.accessor("userName",{
                 header :"Usuario",
             }),
-            columnHelper.accessor("stateRequest",{
+            columnHelper.accessor("stateUpdate",{
                 header :"Estado",
                 cell(props) {
                     return <Chip label={props.getValue()} color={colorChip[props.getValue()]} />

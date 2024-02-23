@@ -7,14 +7,14 @@ type StoreRequest = {
     isOpenDialogEdit : boolean
     isOpenDialogEditForSuper : boolean
     requestToEdit : DtoResRequestsForAdmin | null
-    requestToEditForSuper : DtoResRequestsForSuper | null
+    requestToEditForSuper : DtoResRequestsForAdmin | null
 
     setIsOpenDialogCreate : (isOpen : boolean ) => void
     setSubRoomId : (id : number) => void
     setRequestToEdit : (request : DtoResRequestsForAdmin|null) => void
     setIsOpenDialogEdit : (isOpen : boolean ) => void
     setIsOpenDialogEditForSuper : (isOpen : boolean ) => void
-    setRequestToEditForSuper : (request : DtoResRequestsForSuper|null) => void
+    setRequestToEditForSuper : (request : DtoResRequestsForAdmin|null) => void
 }
 
 export const useStoreRequest = create<StoreRequest>((set,get) => ({
@@ -41,7 +41,7 @@ export const useStoreRequest = create<StoreRequest>((set,get) => ({
         set( state => ({...state , requestToEdit : request}) )
     },
     setRequestToEditForSuper(request) {
-        set( state => ({...state , requestToEditForSuper : request}) )
+        set( state => ({...state , DtoResRequestsForAdmin : request}) )
     },
     getRoomId(){
         return get().subRoomId
