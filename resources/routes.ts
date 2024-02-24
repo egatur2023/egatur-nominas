@@ -34,7 +34,7 @@ export const itemsSidebarAdmin : AreaSidebar[] =
                     name : 'Admisiones',
                     title : 'Admisiones2',
                     path : '/app/admin/admission',
-                    permissions : 'Admisiones.read'
+                    permissions : 'Admisiones/Asistencias.read'
                 },
                 {
                     name : 'Roles',

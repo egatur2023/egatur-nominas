@@ -49,7 +49,7 @@ export default function OneRegister({register} : {register : DtoResRegisterWithS
         }
     }
 
-    const isAuthoriedForReadAssistance = hasPermission(data?.user?.role?.permissions || [], "Admisiones.read")
+    const isAuthoriedForReadAssistance = hasPermission(data?.user?.role?.permissions || [], "Admisiones/Asistencias.read")
     const isAuthoriedForCreateRequest = hasPermission(data?.user?.role?.permissions || [], "Solicitudes.create")
     const isAuthoriedForUpdateRegister = hasPermission(data?.user?.role?.permissions || [], "Nominas.update")
 
