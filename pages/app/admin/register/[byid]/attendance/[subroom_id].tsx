@@ -91,7 +91,7 @@ export default function AttendanceBySubscriptionRoomPage(){
         }
     )
 
-    const isAuthoriedForUpdateAssistance = hasPermission(session?.user?.role?.permissions || [], "Admisiones.update")
+    const isAuthoriedForUpdateAssistance = hasPermission(session?.user?.role?.permissions || [], "Admisiones/Asistencias.update")
 
     const columnHelper = createColumnHelper<Attendance>()
     const columns : ColumnDef<Attendance,any>[] = useMemo(()=>
@@ -230,7 +230,6 @@ export default function AttendanceBySubscriptionRoomPage(){
             </Button>
         </Stack>
         <DataTable
-            //@ts-ignore
             columns={columns}
             data={ responseAttendance?.attendances || []}
         />

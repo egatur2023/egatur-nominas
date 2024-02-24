@@ -435,7 +435,7 @@ type MODULE_VALUES = 'Módulos.create'|'Módulos.read' | 'Módulos.update'| 'Mó
 'Malla Curricular.create'|'Malla Curricular.read' |'Malla Curricular.update'|'Malla Curricular.delete'|
 'Nominas.create'| 'Nominas.read'| 'Nominas.update'| 'Nominas.delete'|
 'Docentes.create'|'Docentes.read' | 'Docentes.update'| 'Docentes.delete'|
-'Admisiones.create'| 'Admisiones.read' | 'Admisiones.update' |'Admisiones.delete'|
+'Admisiones/Asistencias.create'| 'Admisiones/Asistencias.read' | 'Admisiones/Asistencias.update' |'Admisiones/Asistencias.delete'|
 'Roles.create' | 'Roles.read'| 'Roles.update' | 'Roles.delete'|
 'Reporte General.create'| 'Reporte General.read'| 'Reporte General.update'|  'Reporte General.delete'|
 'Matrícula.create'| 'Matrícula.read'| 'Matrícula.update'|  'Matrícula.delete'|

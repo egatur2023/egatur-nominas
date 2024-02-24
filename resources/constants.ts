@@ -29,7 +29,7 @@ export const MODULES = {
     Malla_Curricular  : 'Malla Curricular',
     Nominas  : 'Nominas',
     Docentes  : 'Docentes',
-    Admisiones  : 'Admisiones',
+    'Admisiones/Asistencias'  : 'Admisiones/Asistencias',
     Roles  : 'Roles',
     Reporte_General  : 'Reporte General',
     Matrícula  : 'Matrícula',
