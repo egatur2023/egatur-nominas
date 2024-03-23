@@ -1,12 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import DataTable from "../data.table";
 import API from "@api";
-import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { ResultGetRoles } from "resources/types";
 import { useMemo, useState } from "react";
 import { Box, Button, Card, CardContent, Checkbox, Divider, List, ListItem, Stack, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs } from "@mui/material"
 import { ModuleSystem, Permission } from "@prisma/client";
-import { Add, CheckBox } from "@mui/icons-material";
+import { useSession } from 'next-auth/react'
+
 
 type TabPanelPermissionProps = {
     id : number
@@ -15,6 +14,7 @@ type TabPanelPermissionProps = {
     children?: React.ReactNode
 }
 export default function RoleList(){
+    const { data , update } = useSession()
 
     const qc = useQueryClient()
     const { data : roles } = useQuery<ResultGetRoles>(
@@ -31,7 +31,9 @@ export default function RoleList(){
             {
                 onSuccess: (data, variables, context) => {
                     qc.invalidateQueries(["api/roles"])
+                    qc.invalidateQueries(["roles"])
                     setIsSubmitting(false)
+                    update()
                 },
                 onError: (error) => {
                     setIsSubmitting(false)

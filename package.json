@@ -32,7 +32,7 @@
     "jspdf-autotable": "^3.8.1",
     "luxon": "^3.0.1",
     "next": "^13.2.4",
-    "next-auth": "^4.18.10",
+    "next-auth": "4.24.7",
     "node-cache": "^5.1.2",
     "pdfkit": "^0.14.0",
     "pdfkit-table": "^0.1.99",

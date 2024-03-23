@@ -23,7 +23,6 @@ export function UserList(){
         }
     )
     const isAuthorizedForUpdateUser = hasPermission(data?.user?.role.permissions || [],'Usuarios.update')
-
     const handleEdit = (user : (User & { role : Role})) => {
         setUserToEdit(user)
         setIsOpenEdit(true)
