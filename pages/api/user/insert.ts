@@ -5,15 +5,22 @@ import { createUser } from "../../../resources/services/user/insert";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
         try {
+            console.log("Datos recibidos:", req.body);
             const user = req.body;
+
+            // Verificar que los campos necesarios estén presentes
+            if (!user.email || !user.password || !user.username || user.roleId === undefined) {
+                return res.status(400).json({ message: "Faltan datos necesarios" });
+            }
+
             const newUser = await createUser(user);
             res.status(201).json(newUser);
         } catch (error) {
-            console.error("Error creating user:", error);
-            res.status(500).json({ message: "Error al crear el usuario" });
+            console.error("Error al crear el usuario:", error);
+            res.status(500).json({ message: "Error al crear el usuario", error: error.message });
         }
     } else {
         res.setHeader("Allow", ["POST"]);
-        res.status(405).end(`Method ${req.method} Not Allowed`);
+        res.status(405).end(`Método ${req.method} No Permitido`);
     }
 }
