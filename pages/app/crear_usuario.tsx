@@ -21,7 +21,7 @@ const CreateUser = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const res = await fetch('/api/users', {
+        const res = await fetch('/api/user/insert', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
