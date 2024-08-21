@@ -17,7 +17,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             res.status(201).json(newUser);
         } catch (error) {
             console.error("Error al crear el usuario:", error);
-            res.status(500).json({ message: "Error al crear el usuario", error: error.message });
+
+            // Manejo seguro del error
+            const errorMessage = (error as Error).message || "Error desconocido";
+
+            res.status(500).json({ message: "Error al crear el usuario", error: errorMessage });
         }
     } else {
         res.setHeader("Allow", ["POST"]);
